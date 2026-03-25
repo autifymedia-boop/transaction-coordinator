@@ -228,8 +228,11 @@
       h2.font-black{font-size:1.875rem!important;line-height:1.1!important}
       h1.font-black{font-size:2rem!important;line-height:1.05!important}
 
-      /* Comparison table: make text & cells smaller so table fits */
-      table td,table th{padding:.5rem .75rem!important;font-size:.78rem!important}
+      /* Hamburger menu animation */
+      #menuBtn span{display:block;width:20px;height:2px;background:#1C1108;border-radius:2px;transition:transform .25s,opacity .25s}
+      #menuBtn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+      #menuBtn.open span:nth-child(2){opacity:0}
+      #menuBtn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 
       /* Chat widget: reduce fixed heights so it doesn't dominate a mobile screen */
       #chatMessages{max-height:210px!important}
@@ -277,8 +280,23 @@
       <a href="#book" class="btn-s cursor-pointer bg-orange hover:bg-orh text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-orange/25 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2 flex items-center gap-1.5">
         Get Started <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
       </a>
+      <!-- Hamburger — mobile only -->
+      <button id="menuBtn" onclick="toggleMenu()" aria-label="Open navigation menu" aria-expanded="false" class="md:hidden flex flex-col gap-[5px] p-2 -mr-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange/40">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
+
+  <!-- Mobile slide-down menu -->
+  <div id="mobileMenu" class="hidden md:hidden bg-cream border-t border-cream3 shadow-lg px-6 pt-5 pb-7">
+    <nav class="flex flex-col gap-1">
+      <a href="#how-it-works" onclick="toggleMenu()" class="text-base font-semibold text-ink py-3 border-b border-cream3 hover:text-orange transition-colors flex items-center justify-between">How It Works <svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+      <a href="#use-cases" onclick="toggleMenu()" class="text-base font-semibold text-ink py-3 border-b border-cream3 hover:text-orange transition-colors flex items-center justify-between">Use Cases <svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+      <a href="#pricing" onclick="toggleMenu()" class="text-base font-semibold text-ink py-3 border-b border-cream3 hover:text-orange transition-colors flex items-center justify-between">Pricing <svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+      <a href="#book" onclick="toggleMenu()" class="text-base font-semibold text-ink py-3 border-b border-cream3 hover:text-orange transition-colors flex items-center justify-between">Book a Call <svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
+      <a href="#book" onclick="toggleMenu()" class="mt-4 bg-orange text-white font-bold text-base px-6 py-3.5 rounded-xl text-center hover:bg-orh transition-colors">Get Started →</a>
+    </nav>
+  </div>
 </header>
 
 <!-- HERO -->
@@ -877,53 +895,87 @@
       <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange mb-4 reveal">The Numbers</p>
       <h2 class="font-sans font-black text-4xl md:text-5xl text-ink leading-[1.05] reveal d1">Human TC vs. The Deal Machine</h2>
     </div>
-    <div class="bg-white border border-cream3 rounded-[2rem] overflow-hidden shadow-lg shadow-ink/5 reveal d1 overflow-x-auto">
-      <table class="w-full min-w-[520px]">
-        <thead>
-          <tr class="border-b border-cream3">
-            <th class="text-left px-8 py-5 text-sm font-bold text-muted uppercase tracking-wider w-2/5"></th>
-            <th class="px-8 py-5 text-center text-sm font-bold text-muted uppercase tracking-wider">Human TC</th>
-            <th class="px-8 py-5 text-center bg-orl text-sm font-bold text-orange uppercase tracking-wider rounded-t-xl">The Deal Machine</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-cream3">
-          <tr>
-            <td class="px-8 py-4 text-sm font-medium text-ink">Monthly cost (6 deals)</td>
-            <td class="px-8 py-4 text-center text-sm text-muted">$1,800 – $3,000</td>
-            <td class="px-8 py-4 text-center text-sm font-bold text-orange bg-orl/30">$297/mo</td>
-          </tr>
-          <tr>
-            <td class="px-8 py-4 text-sm font-medium text-ink">Available 24/7</td>
-            <td class="px-8 py-4 text-center"><svg class="w-5 h-5 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></td>
-            <td class="px-8 py-4 text-center bg-orl/30"><svg class="w-5 h-5 text-orange mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></td>
-          </tr>
-          <tr>
-            <td class="px-8 py-4 text-sm font-medium text-ink">Scales with deal volume</td>
-            <td class="px-8 py-4 text-center"><svg class="w-5 h-5 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></td>
-            <td class="px-8 py-4 text-center bg-orl/30"><svg class="w-5 h-5 text-orange mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></td>
-          </tr>
-          <tr>
-            <td class="px-8 py-4 text-sm font-medium text-ink">CRM auto-fill after calls</td>
-            <td class="px-8 py-4 text-center"><svg class="w-5 h-5 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></td>
-            <td class="px-8 py-4 text-center bg-orl/30"><svg class="w-5 h-5 text-orange mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></td>
-          </tr>
-          <tr>
-            <td class="px-8 py-4 text-sm font-medium text-ink">Shared deal status hub</td>
-            <td class="px-8 py-4 text-center text-muted text-sm">Extra cost</td>
-            <td class="px-8 py-4 text-center bg-orl/30"><svg class="w-5 h-5 text-orange mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></td>
-          </tr>
-          <tr>
-            <td class="px-8 py-4 text-sm font-medium text-ink">Setup time</td>
-            <td class="px-8 py-4 text-center text-sm text-muted">Weeks of onboarding</td>
-            <td class="px-8 py-4 text-center text-sm font-bold text-orange bg-orl/30">72 hours</td>
-          </tr>
-          <tr>
-            <td class="px-8 py-4 text-sm font-medium text-ink">No long-term contract</td>
-            <td class="px-8 py-4 text-center"><svg class="w-5 h-5 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></td>
-            <td class="px-8 py-4 text-center bg-orl/30"><svg class="w-5 h-5 text-orange mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Responsive comparison — stacks on mobile, 3-col on desktop -->
+    <div class="bg-white border border-cream3 rounded-[2rem] overflow-hidden shadow-lg shadow-ink/5 reveal d1">
+
+      <!-- Column headers -->
+      <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[2fr_1fr_1fr] border-b border-cream3">
+        <div class="hidden md:block px-8 py-5"></div>
+        <div class="px-4 py-4 text-center text-xs font-bold text-muted uppercase tracking-wider border-r border-cream3 md:border-r-0">Human TC</div>
+        <div class="px-4 py-4 text-center text-xs font-bold text-orange uppercase tracking-wider bg-orl">The Deal Machine</div>
+      </div>
+
+      <!-- Row helper structure: label spans full width on mobile, hides on desktop -->
+      <!-- Row 1 -->
+      <div class="border-b border-cream3">
+        <div class="md:hidden px-5 py-2 bg-cream/60 text-xs font-bold text-ink border-b border-cream3">Monthly cost (6 deals)</div>
+        <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[2fr_1fr_1fr]">
+          <div class="hidden md:flex px-8 py-4 text-sm font-medium text-ink items-center">Monthly cost (6 deals)</div>
+          <div class="px-4 py-3.5 text-center text-sm text-muted flex items-center justify-center border-r border-cream3 md:border-r-0">$1,800 – $3,000</div>
+          <div class="px-4 py-3.5 text-center text-sm font-bold text-orange bg-orl/30 flex items-center justify-center">$297/mo</div>
+        </div>
+      </div>
+
+      <!-- Row 2 -->
+      <div class="border-b border-cream3">
+        <div class="md:hidden px-5 py-2 bg-cream/60 text-xs font-bold text-ink border-b border-cream3">Available 24/7</div>
+        <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[2fr_1fr_1fr]">
+          <div class="hidden md:flex px-8 py-4 text-sm font-medium text-ink items-center">Available 24/7</div>
+          <div class="px-4 py-3.5 flex items-center justify-center border-r border-cream3 md:border-r-0"><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div>
+          <div class="px-4 py-3.5 flex items-center justify-center bg-orl/30"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div>
+        </div>
+      </div>
+
+      <!-- Row 3 -->
+      <div class="border-b border-cream3">
+        <div class="md:hidden px-5 py-2 bg-cream/60 text-xs font-bold text-ink border-b border-cream3">Scales with deal volume</div>
+        <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[2fr_1fr_1fr]">
+          <div class="hidden md:flex px-8 py-4 text-sm font-medium text-ink items-center">Scales with deal volume</div>
+          <div class="px-4 py-3.5 flex items-center justify-center border-r border-cream3 md:border-r-0"><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div>
+          <div class="px-4 py-3.5 flex items-center justify-center bg-orl/30"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div>
+        </div>
+      </div>
+
+      <!-- Row 4 -->
+      <div class="border-b border-cream3">
+        <div class="md:hidden px-5 py-2 bg-cream/60 text-xs font-bold text-ink border-b border-cream3">CRM auto-fill after calls</div>
+        <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[2fr_1fr_1fr]">
+          <div class="hidden md:flex px-8 py-4 text-sm font-medium text-ink items-center">CRM auto-fill after calls</div>
+          <div class="px-4 py-3.5 flex items-center justify-center border-r border-cream3 md:border-r-0"><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div>
+          <div class="px-4 py-3.5 flex items-center justify-center bg-orl/30"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div>
+        </div>
+      </div>
+
+      <!-- Row 5 -->
+      <div class="border-b border-cream3">
+        <div class="md:hidden px-5 py-2 bg-cream/60 text-xs font-bold text-ink border-b border-cream3">Shared deal status hub</div>
+        <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[2fr_1fr_1fr]">
+          <div class="hidden md:flex px-8 py-4 text-sm font-medium text-ink items-center">Shared deal status hub</div>
+          <div class="px-4 py-3.5 text-center text-sm text-muted flex items-center justify-center border-r border-cream3 md:border-r-0">Extra cost</div>
+          <div class="px-4 py-3.5 flex items-center justify-center bg-orl/30"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div>
+        </div>
+      </div>
+
+      <!-- Row 6 -->
+      <div class="border-b border-cream3">
+        <div class="md:hidden px-5 py-2 bg-cream/60 text-xs font-bold text-ink border-b border-cream3">Setup time</div>
+        <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[2fr_1fr_1fr]">
+          <div class="hidden md:flex px-8 py-4 text-sm font-medium text-ink items-center">Setup time</div>
+          <div class="px-4 py-3.5 text-center text-sm text-muted flex items-center justify-center border-r border-cream3 md:border-r-0">Weeks of onboarding</div>
+          <div class="px-4 py-3.5 text-center text-sm font-bold text-orange bg-orl/30 flex items-center justify-center">72 hours</div>
+        </div>
+      </div>
+
+      <!-- Row 7 -->
+      <div>
+        <div class="md:hidden px-5 py-2 bg-cream/60 text-xs font-bold text-ink border-b border-cream3">No long-term contract</div>
+        <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[2fr_1fr_1fr]">
+          <div class="hidden md:flex px-8 py-4 text-sm font-medium text-ink items-center">No long-term contract</div>
+          <div class="px-4 py-3.5 flex items-center justify-center border-r border-cream3 md:border-r-0"><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></div>
+          <div class="px-4 py-3.5 flex items-center justify-center bg-orl/30"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -1372,6 +1424,16 @@ window.addEventListener('scroll',()=>{
 });
 
 /* ── FAQ Accordion ── */
+function toggleMenu(){
+  const menu = document.getElementById('mobileMenu');
+  const btn  = document.getElementById('menuBtn');
+  const open = menu.classList.toggle('hidden') === false;
+  btn.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', String(open));
+  // Prevent body scroll when menu is open
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+
 function toggleFaq(btn){
   const ans=btn.nextElementSibling;
   const arrow=btn.querySelector('.faq-arrow');
