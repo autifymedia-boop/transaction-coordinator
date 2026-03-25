@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Transaction Coordinator for Real Estate Agents | Autify</title>
+  <meta name="description" content="The Deal Machine by Autify gives solo real estate agents an AI Transaction Coordinator, Deal Status Hub, and Post-Call CRM Agent — live in 72 hours. $297/month after $497 setup."/>
+  <meta property="og:title" content="AI Transaction Coordinator for Real Estate Agents | Autify"/>
+  <meta property="og:description" content="Stop being your own TC. The Deal Machine handles contracts, communications, and CRM updates — so deals finally close themselves. Book a free strategy call."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="logo.png"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="AI Transaction Coordinator for Real Estate Agents | Autify"/>
+  <meta name="twitter:description" content="Stop being your own TC. The Deal Machine by Autify handles your entire transaction pipeline. Live in 72 hours."/>
+
+  <!--
+    SECURITY: Content Security Policy
+    ─────────────────────────────────────────────────────────────────────────────
+    • frame-ancestors 'none'  → prevents clickjacking (iframe embedding)
+    • base-uri 'self'         → blocks <base> tag injection (URL hijacking)
+    • object-src 'none'       → blocks Flash/plugin execution
+    • connect-src             → only EmailJS API can be called (blocks data exfil)
+    • img-src                 → allows HTTPS images (OG previews) + data URIs
+    • script-src / style-src require 'unsafe-inline' + 'unsafe-eval' because:
+        - Tailwind Play CDN uses eval() for JIT compilation
+        - Inline <script> blocks are required by this single-file architecture
+      Migrating to a build system (Vite/Next) would allow removing both.
+    NOTE: HTTP servers must also send X-Frame-Options: DENY and
+          Strict-Transport-Security headers — meta tags cannot replace those.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src  'self' 'unsafe-inline' 'unsafe-eval'
+                https://cdn.jsdelivr.net
+                https://cdn.tailwindcss.com;
+    style-src   'self' 'unsafe-inline'
+                https://fonts.googleapis.com;
+    font-src    https://fonts.gstatic.com;
+    img-src     'self' data: https:;
+    connect-src https://api.emailjs.com;
+    frame-ancestors 'none';
+    object-src  'none';
+    base-uri    'self'
+  "/>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // ── EmailJS Init ──────────────────────────────────────────
+    // SECURITY NOTE — EmailJS credentials:
+    //   • publicKey  : intentionally public (EmailJS client-side design)
+    //   • serviceID  : semi-public, but exposing it + template ID enables
+    //                  quota abuse from other domains
+    //
+    // REQUIRED ACTION → enforce domain allowlist in the EmailJS dashboard:
+    //   Dashboard → Account → Security → Allowed Origins
+    //   Add only your production domain (e.g. https://autify.com)
+    //   This prevents anyone else from calling your service + template
+    //   with your key from a different origin.
+    //
+    // If this page ever moves to a build system (Vite, Next.js, etc.),
+    // move serviceID and templateID to .env and inject at build time so
+    // they are not present in the shipped source.
+    emailjs.init({ publicKey: 'q11g0DYmRNJgJqLsz' });
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { display:['Cinzel','serif'], sans:['Outfit','sans-serif'] },
+          colors: {
+            cream:'#FAF8F4', cream2:'#F2EBE1', cream3:'#E8DDD3',
+            orange:'#E0550A', orh:'#C4460A', orl:'#FFF4ED', orm:'#F59B3A',
+            ink:'#1C1108', muted:'#6B5344',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{background:#FAF8F4;color:#1C1108;font-family:'Outfit',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+    /* ── Reveal ── */
+    .reveal{opacity:0;transform:translateY(30px);transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1)}
+    .reveal.from-left{transform:translateX(-36px)}
+    .reveal.from-right{transform:translateX(36px)}
+    .reveal.scale-up{transform:scale(.94) translateY(18px)}
+    .reveal.blur-in{filter:blur(6px);transform:translateY(16px)}
+    .reveal.visible{opacity:1!important;transform:none!important;filter:none!important}
+    .d1{transition-delay:.09s}.d2{transition-delay:.18s}.d3{transition-delay:.27s}.d4{transition-delay:.36s}.d5{transition-delay:.45s}.d6{transition-delay:.54s}
+
+    /* ── Section glow spots ── */
+    .glow-spot{position:absolute;border-radius:50%;pointer-events:none;filter:blur(80px);will-change:transform;contain:layout style}
+    .glow-orange{background:radial-gradient(circle,rgba(224,85,10,.13) 0%,transparent 70%)}
+    .glow-warm{background:radial-gradient(circle,rgba(245,155,58,.09) 0%,transparent 70%)}
+    .glow-ink{background:radial-gradient(circle,rgba(28,17,8,.07) 0%,transparent 70%)}
+
+    /* ── Premium card glow on hover ── */
+    .card-lift{transition:transform .28s cubic-bezier(.22,1,.36,1),box-shadow .28s,background .2s}
+    .card-lift:hover{transform:translateY(-7px);box-shadow:0 24px 60px rgba(28,17,8,.11),0 0 0 1px rgba(224,85,10,.07)}
+
+    /* ── Section divider gradient line ── */
+    .grad-line{height:1px;background:linear-gradient(90deg,transparent,rgba(224,85,10,.22) 30%,rgba(224,85,10,.22) 70%,transparent)}
+
+    /* ── Subtle text shimmer on orange headings ── */
+    @keyframes hueShift{0%,100%{color:#E0550A}50%{color:#C4460A}}
+
+    /* ── Stat pop ── */
+    @keyframes statPop{0%{transform:scale(.85);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+    .stat-pop{opacity:0}
+    .stat-pop.vis{animation:statPop .55s cubic-bezier(.22,1,.36,1) forwards}
+
+    /* ── Line draw vertical ── */
+    @keyframes lineGrow{0%{transform:scaleY(0);opacity:0}100%{transform:scaleY(1);opacity:1}}
+    .line-grow{transform-origin:top;transform:scaleY(0);opacity:0;transition:transform .6s cubic-bezier(.22,1,.36,1),opacity .3s}
+    .line-grow.visible{transform:scaleY(1);opacity:1}
+
+    /* ── Nav ── */
+    .nav-glass{background:rgba(250,248,244,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(224,85,10,.1)}
+
+    /* ── SVG draw ── */
+    @keyframes drawCircle{0%{stroke-dashoffset:340}100%{stroke-dashoffset:0}}
+    @keyframes drawLine{0%{stroke-dashoffset:250}100%{stroke-dashoffset:0}}
+    .circle-path{stroke-dasharray:340;stroke-dashoffset:340;animation:drawCircle 1.4s .5s cubic-bezier(.22,1,.36,1) forwards}
+    .underline-path{stroke-dasharray:320;stroke-dashoffset:320;animation:drawLine 1.2s 1.9s cubic-bezier(.22,1,.36,1) forwards}
+
+    /* ── Card hover ── */
+    .card-oh{transition:transform .28s cubic-bezier(.22,1,.36,1),box-shadow .28s,background .2s}
+    .card-oh:hover{transform:translateY(-4px);background:#FFF4ED;box-shadow:0 12px 36px rgba(224,85,10,.1)}
+    /* ─── FLIP CARDS ────────────────────────────────────────────────────── */
+    .flip-card{perspective:1200px;cursor:pointer;}
+    .flip-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.22,1,.36,1);will-change:transform;}
+    .flip-card.flipped .flip-card-inner{transform:rotateY(180deg);}
+    .flip-front,.flip-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1.5rem;padding:1.5rem;}
+    .flip-front{background:#fff;border:1.5px solid #E8E0D8;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.75rem;}
+    .flip-back{background:#E0550A;transform:rotateY(180deg);display:flex;flex-direction:column;justify-content:center;}
+    .flip-hint{font-size:.7rem;letter-spacing:.06em;color:rgba(26,18,8,.35);display:flex;align-items:center;gap:.25rem;margin-top:.25rem;}
+    .flip-card:hover .flip-front:not(.flipped .flip-front){box-shadow:0 8px 28px rgba(224,85,10,.12);border-color:rgba(224,85,10,.25);}
+
+    /* ── Shimmer ── */
+    @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+    .btn-s{position:relative;overflow:hidden}
+    .btn-s::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);background-size:200% 100%;animation:shimmer 2.4s linear infinite;pointer-events:none}
+
+    /* ── Float ── */
+    @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+    .float-a{animation:floatY 6s ease-in-out infinite}
+
+    /* ── Pulse dot ── */
+    @keyframes pd{0%,100%{opacity:1}50%{opacity:.25}} .pd{animation:pd 2s ease infinite}
+
+    /* ── Ticker ── */
+    .ticker-i{display:flex;width:max-content;will-change:transform}
+
+    /* ── Dot grid ── */
+    .dot-grid{background-image:radial-gradient(rgba(28,17,8,.16) 1px,transparent 1px);background-size:26px 26px}
+
+    /* ── Flowchart ── */
+    @keyframes flowIn{0%{opacity:0;transform:translateX(-24px)}100%{opacity:1;transform:none}}
+    .flow-step{opacity:0}
+    .flow-step.vis{animation:flowIn .5s cubic-bezier(.22,1,.36,1) forwards}
+
+    /* ── Chat ── */
+    .cb-u{background:#E0550A;color:#fff;border-radius:18px 18px 4px 18px;padding:.7rem .95rem;font-size:.88rem;line-height:1.5;max-width:88%;align-self:flex-end;box-shadow:0 4px 14px rgba(224,85,10,.25)}
+    .cb-a{background:#fff;color:#1C1108;border-radius:18px 18px 18px 4px;padding:.7rem .95rem;font-size:.88rem;line-height:1.5;max-width:92%;align-self:flex-start;box-shadow:0 2px 10px rgba(28,17,8,.07);border:1px solid #F0E8E0}
+    @keyframes tp{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    .tp-dot{width:7px;height:7px;background:#C4460A;border-radius:50%}
+    .tp-dot:nth-child(1){animation:tp .8s 0s ease infinite}
+    .tp-dot:nth-child(2){animation:tp .8s .2s ease infinite}
+    .tp-dot:nth-child(3){animation:tp .8s .4s ease infinite}
+    @keyframes msgIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
+    .msg-enter{animation:msgIn .35s cubic-bezier(.22,1,.36,1) forwards}
+
+    /* ── Calendar ── */
+    .cal-day{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:.875rem;font-weight:500;cursor:pointer;transition:background .15s,transform .15s,color .15s}
+    .cal-day.av:hover{background:rgba(224,85,10,.1);transform:scale(1.08)}
+    .cal-day.sel{background:#E0550A;color:#fff;transform:scale(1.1);box-shadow:0 4px 14px rgba(224,85,10,.3)}
+    .cal-day.dis{color:#c8beb6;cursor:not-allowed;pointer-events:none}
+    .cal-day.tring{box-shadow:0 0 0 2px #E0550A}
+    .tpill{padding:.5rem 1rem;border-radius:999px;border:1.5px solid #E0550A;color:#E0550A;font-size:.84rem;font-weight:600;cursor:pointer;transition:background .15s,color .15s,transform .15s;white-space:nowrap}
+    .tpill:hover{background:rgba(224,85,10,.08);transform:scale(1.04)}
+    .tpill.sel{background:#E0550A;color:#fff;box-shadow:0 4px 12px rgba(224,85,10,.28)}
+    @keyframes tpIn{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:none}}
+    .tpill{animation:tpIn .22s cubic-bezier(.22,1,.36,1) both}
+    .fi{width:100%;border:1.5px solid #E8DDD5;border-radius:12px;padding:.72rem 1rem;font-family:'Outfit',sans-serif;font-size:.95rem;color:#1C1108;background:#fff;transition:border-color .2s,box-shadow .2s;outline:none}
+    .fi:focus{border-color:#E0550A;box-shadow:0 0 0 3px rgba(224,85,10,.12)}
+    .fi::placeholder{color:#b0a099}
+    @keyframes sOL{0%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(-40px)}}
+    @keyframes sIR{0%{opacity:0;transform:translateX(40px)}100%{opacity:1;transform:translateX(0)}}
+    @keyframes sIL{0%{opacity:0;transform:translateX(-40px)}100%{opacity:1;transform:translateX(0)}}
+    @keyframes fSI{0%{opacity:0;transform:scale(.94)}100%{opacity:1;transform:scale(1)}}
+    @keyframes dC{0%{stroke-dashoffset:60}100%{stroke-dashoffset:0}}
+    .ck{stroke-dasharray:60;stroke-dashoffset:60;animation:dC .7s .25s cubic-bezier(.22,1,.36,1) forwards}
+    @keyframes cI{0%{opacity:0;transform:scale(.5)}100%{opacity:1;transform:scale(1)}}
+    .cc{animation:cI .4s cubic-bezier(.22,1,.36,1) forwards}
+
+    /* ── FAQ ── */
+    .faq-ans{overflow:hidden;max-height:0;transition:max-height .32s cubic-bezier(.22,1,.36,1)}
+
+    /* ── Divider ── */
+    .div{height:1px;background:linear-gradient(90deg,transparent,rgba(224,85,10,.18),transparent)}
+
+    /* ── Grain ── */
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.45}
+
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#FAF8F4}::-webkit-scrollbar-thumb{background:#E0550A;border-radius:3px}
+
+    @media(prefers-reduced-motion:reduce){
+      .reveal,.card-lift,.float-a,.ticker-i,.btn-s::after,.circle-path,.underline-path,.flow-step{animation:none!important;transition:none!important;opacity:1!important;transform:none!important}
+      .flip-card-inner{transition:none!important;}
+    }
+
+    /* ── MOBILE OPTIMISATION (max-width: 767px) ───────────── */
+    @media(max-width:767px){
+      /* Prevent decorative blobs from causing horizontal scroll */
+      body{overflow-x:hidden}
+      html{overflow-x:hidden}
+
+      /* Tighten section vertical padding site-wide */
+      section{padding-top:3.5rem!important;padding-bottom:3.5rem!important}
+
+      /* Scale down all large section headings */
+      h2.font-black{font-size:1.875rem!important;line-height:1.1!important}
+      h1.font-black{font-size:2rem!important;line-height:1.05!important}
+
+      /* Comparison table: make text & cells smaller so table fits */
+      table td,table th{padding:.5rem .75rem!important;font-size:.78rem!important}
+
+      /* Chat widget: reduce fixed heights so it doesn't dominate a mobile screen */
+      #chatMessages{max-height:210px!important}
+      #consultant [style*="min-height"]{min-height:380px!important}
+
+      /* Calendar: slightly smaller day cells for narrow screens */
+      .cal-day{width:34px!important;height:34px!important;border-radius:8px!important;font-size:.75rem!important}
+      #calStep1,#calStep2,#calStep3{padding:1.25rem!important}
+
+      /* FAQ: reduce oversized button padding */
+      .faq-q{padding:.875rem 1.25rem!important}
+      .faq-ans p{padding:0 1.25rem 1rem!important}
+
+      /* Before/After cards: reduce padding */
+      #transformation .p-8{padding:1.5rem!important}
+
+      /* Final CTA: rein in bottom text */
+      #final-cta .text-xl{font-size:1rem!important}
+
+      /* Booking left-column description spacing */
+      #book .mb-10{margin-bottom:1.5rem!important}
+      #book .space-y-5>*+*{margin-top:.75rem!important}
+
+      /* Tighten hero bottom margin so it doesn't clip on short screens */
+      .dot-grid{padding-top:5.5rem!important;padding-bottom:3rem!important;min-height:unset!important}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="fixed top-0 left-0 right-0 z-50">
+  <nav class="nav-glass px-6 py-4 flex items-center justify-between max-w-7xl mx-auto">
+    <a href="#" class="flex items-center gap-2.5" aria-label="Autify">
+      <img src="logo.png" alt="Autify" class="w-9 h-9 rounded-xl object-cover"/>
+      <span class="font-display font-semibold text-ink text-sm tracking-wide">Autify</span>
+    </a>
+    <div class="hidden md:flex items-center gap-8 text-sm font-medium text-muted">
+      <a href="#how-it-works" class="hover:text-orange transition-colors cursor-pointer">How It Works</a>
+      <a href="#use-cases" class="hover:text-orange transition-colors cursor-pointer">Use Cases</a>
+      <a href="#pricing" class="hover:text-orange transition-colors cursor-pointer">Pricing</a>
+      <a href="#book" class="hover:text-orange transition-colors cursor-pointer">Book a Call</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="#book" class="btn-s cursor-pointer bg-orange hover:bg-orh text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-orange/25 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2 flex items-center gap-1.5">
+        Get Started <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="pt-28 pb-20 px-6 min-h-[100dvh] flex items-center relative overflow-hidden dot-grid">
+  <div class="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-orange/8 blur-[120px] pointer-events-none"></div>
+  <div class="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-orm/10 blur-[80px] pointer-events-none"></div>
+  <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-[1fr_480px] gap-14 items-center relative z-10">
+    <div>
+      <div class="inline-flex items-center gap-2 bg-orl border border-orange/20 text-orange text-xs font-bold px-3 py-1.5 rounded-full mb-8 reveal">
+        <span class="w-1.5 h-1.5 rounded-full bg-orange pd inline-block"></span>
+        Your Deal Team — Available 24/7
+      </div>
+      <h1 class="font-sans font-black text-[2rem] sm:text-5xl md:text-6xl xl:text-[5rem] text-ink leading-[1.0] tracking-tight mb-6 reveal d1">
+        It's Not Just<br/>
+        <span class="relative inline-block mr-2">
+          <span class="relative z-10">You</span>
+          <svg class="absolute pointer-events-none" style="top:-20%;left:-16%;width:132%;height:145%;overflow:visible" viewBox="0 0 110 62" fill="none" aria-hidden="true">
+            <ellipse cx="55" cy="31" rx="52" ry="27" stroke="#E0550A" stroke-width="3.5" stroke-linecap="round" class="circle-path"/>
+          </svg>
+        </span>Anymore.
+      </h1>
+      <p class="text-lg md:text-xl text-muted leading-relaxed max-w-xl mb-3 reveal d2">For solo real estate agents ready to stop being their own transaction coordinator. We handle your contracts, communications, and CRM — so deals</p>
+      <p class="text-xl md:text-2xl font-bold text-ink mb-10 reveal d2">
+        <span class="relative inline-block">
+          finally close themselves.
+          <svg class="absolute pointer-events-none" style="bottom:-5px;left:0;width:100%;height:11px;overflow:visible" viewBox="0 0 310 11" fill="none" aria-hidden="true">
+            <path d="M3 7 Q77 11 155 6 Q233 1 307 8" stroke="#E0550A" stroke-width="3.5" stroke-linecap="round" class="underline-path"/>
+          </svg>
+        </span>
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 mb-12 reveal d3">
+        <a href="#pricing" class="btn-s cursor-pointer inline-flex items-center justify-center gap-2 bg-orange hover:bg-orh text-white font-bold text-base px-8 py-4 rounded-2xl transition-all hover:shadow-xl hover:shadow-orange/30 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2">
+          Build My Deal Machine <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+        </a>
+        <a href="#book" class="cursor-pointer inline-flex items-center justify-center gap-2 border border-cream3 text-ink font-bold text-base px-8 py-4 rounded-2xl hover:bg-cream2 hover:border-orange/30 transition-all focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2">
+          <svg class="w-4 h-4 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Book a Free Call
+        </a>
+      </div>
+      <div class="flex flex-wrap items-center gap-5 text-sm text-muted reveal d4">
+        <div class="flex items-center gap-1.5">
+          <div class="flex gap-0.5">
+            <svg class="w-3.5 h-3.5 text-orm fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-3.5 h-3.5 text-orm fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-3.5 h-3.5 text-orm fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-3.5 h-3.5 text-orm fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-3.5 h-3.5 text-orm fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          </div>
+          <span class="font-semibold text-ink">4.9/5</span> · 200+ agents
+        </div>
+        <span class="text-cream3">·</span>
+        <div class="flex items-center gap-1.5"><svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>30-Day Guarantee</div>
+      </div>
+    </div>
+    <!-- RIGHT CARDS -->
+    <div class="hidden lg:grid grid-cols-1 gap-3.5">
+      <div class="bg-white border border-cream3 rounded-3xl p-5 flex items-center gap-4 shadow-sm card-lift reveal d1">
+        <div class="w-12 h-12 rounded-2xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+        <div class="flex-1"><p class="font-bold text-ink">AI Transaction Coordinator</p><p class="text-xs text-muted mt-0.5">Coordination</p></div>
+        <span class="flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 border border-green-100 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-green-500 pd"></span>Active</span>
+      </div>
+      <div class="bg-white border border-cream3 rounded-3xl p-5 flex items-center gap-4 shadow-sm card-lift reveal d2">
+        <div class="w-12 h-12 rounded-2xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+        <div class="flex-1"><p class="font-bold text-ink">Deal Status Hub</p><p class="text-xs text-muted mt-0.5">Real-Time Updates</p></div>
+        <span class="flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 border border-green-100 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-green-500 pd"></span>Active</span>
+      </div>
+      <div class="bg-white border border-cream3 rounded-3xl p-5 flex items-center gap-4 shadow-sm card-lift reveal d3">
+        <div class="w-12 h-12 rounded-2xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z"/></svg></div>
+        <div class="flex-1"><p class="font-bold text-ink">Post-Call CRM Agent</p><p class="text-xs text-muted mt-0.5">Auto-Fill</p></div>
+        <span class="flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 border border-green-100 px-2 py-1 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-green-500 pd"></span>Active</span>
+      </div>
+      <div class="bg-orange rounded-3xl p-5 flex items-center gap-4 shadow-lg shadow-orange/25 card-lift reveal d4">
+        <div class="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center flex-shrink-0"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+        <div class="flex-1"><p class="font-bold text-white font-display text-base">Autify's Deal Machine</p><p class="text-sm" style="color:rgba(255,220,200,.85)">by Autify · $297/mo + $497 setup</p></div>
+        <div class="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg></div>
+      </div>
+      <div class="bg-white border border-cream3 rounded-2xl p-4 reveal d5">
+        <div class="flex items-start gap-2.5"><div class="text-orange text-2xl font-bold leading-none mt-0.5 font-display">"</div><div><p class="text-sm text-muted italic leading-relaxed">"I fired my TC week three. Month one: 6 deals, zero coordination calls from me."</p><p class="text-xs font-bold text-ink mt-1.5">Marcus R. · Phoenix, AZ · 7 deals/mo</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="bg-ink py-3 overflow-hidden" aria-hidden="true">
+  <div class="ticker-i" id="tickerTrack">
+    <span class="ticker-unit inline-flex items-center gap-3 px-8 text-white/50 text-sm font-medium whitespace-nowrap"><svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>AI Transaction Coordinator <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Multi-Party Deal Status Hub <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Post-Call CRM Auto-Fill <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Save $300–$500 Per Deal <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Live in 48 Hours <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>$297/Month · Cancel Anytime</span>
+    <span class="ticker-unit inline-flex items-center gap-3 px-8 text-white/50 text-sm font-medium whitespace-nowrap"><svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>AI Transaction Coordinator <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Multi-Party Deal Status Hub <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Post-Call CRM Auto-Fill <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Save $300–$500 Per Deal <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Live in 48 Hours <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>$297/Month · Cancel Anytime</span>
+    <span class="ticker-unit inline-flex items-center gap-3 px-8 text-white/50 text-sm font-medium whitespace-nowrap"><svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>AI Transaction Coordinator <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Multi-Party Deal Status Hub <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Post-Call CRM Auto-Fill <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Save $300–$500 Per Deal <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Live in 48 Hours <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>$297/Month · Cancel Anytime</span>
+    <span class="ticker-unit inline-flex items-center gap-3 px-8 text-white/50 text-sm font-medium whitespace-nowrap"><svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>AI Transaction Coordinator <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Multi-Party Deal Status Hub <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Post-Call CRM Auto-Fill <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Save $300–$500 Per Deal <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>Live in 48 Hours <svg class="w-2.5 h-2.5 text-orange fill-current" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4"/></svg>$297/Month · Cancel Anytime</span>
+  </div>
+</div>
+
+<!-- grad divider -->
+<div class="grad-line"></div>
+
+<!-- FLOWCHART — CONTRACT TO CLOSE -->
+<section class="py-28 px-6 relative overflow-hidden" id="how-it-works">
+  <div class="glow-spot glow-orange w-[600px] h-[600px] -top-32 -right-32 opacity-60"></div>
+  <div class="glow-spot glow-warm w-80 h-80 bottom-0 left-10 opacity-50"></div>
+  <div class="max-w-5xl mx-auto relative">
+    <div class="text-center mb-20">
+      <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange mb-4 reveal">From Contract to Close</p>
+      <h2 class="font-sans font-black text-4xl md:text-5xl text-ink leading-[1.05] reveal blur-in d1">From Contract to <em class="not-italic" style="color:#E0550A;font-style:italic">Close</em> — Without the Chaos</h2>
+      <p class="text-muted text-xl mt-4 max-w-2xl mx-auto reveal d2">Your AI deal team handles the entire transaction pipeline.</p>
+    </div>
+    <div class="flex flex-col items-center max-w-xl mx-auto">
+      <div class="flow-step w-full" data-fi="0">
+        <div class="bg-orl border border-orange/20 rounded-2xl p-4 flex items-center gap-3 max-w-xs mx-auto shadow-sm">
+          <div class="w-8 h-8 rounded-xl bg-cream2 border border-cream3 flex items-center justify-center text-sm font-bold text-muted flex-shrink-0">You</div>
+          <p class="text-sm font-medium text-ink">"I need to coordinate this new deal"</p>
+        </div>
+      </div>
+      <div class="w-px h-10 bg-orange/25 my-1"></div>
+      <div class="flow-step w-full" data-fi="1">
+        <div class="bg-white border border-cream3 rounded-3xl p-5 shadow-md max-w-md mx-auto card-lift">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+            <div><p class="font-bold text-sm text-ink">AI Transaction Coordinator</p><span class="text-xs text-orange font-semibold uppercase tracking-wide">Tracking</span></div>
+            <div class="ml-auto w-2 h-2 rounded-full bg-orange pd"></div>
+          </div>
+          <p class="text-sm text-muted">Identifying all deadlines, parties, and required documents. Sending reminders to lender, title, and inspector...</p>
+        </div>
+      </div>
+      <div class="w-px h-10 bg-orange/25 my-1"></div>
+      <div class="flow-step w-full" data-fi="2">
+        <div class="bg-white border border-cream3 rounded-3xl p-5 shadow-md max-w-md mx-auto card-lift">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+            <div><p class="font-bold text-sm text-ink">Deal Status Hub</p><span class="text-xs text-orange font-semibold uppercase tracking-wide">Broadcasting</span></div>
+            <div class="ml-auto w-2 h-2 rounded-full bg-orange pd"></div>
+          </div>
+          <p class="text-sm text-muted">Notifying all parties with live deal status. Nobody needs to call you for an update.</p>
+          <div class="mt-3 flex gap-2"><span class="text-xs bg-green-50 border border-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Buyer notified</span><span class="text-xs bg-orl border border-orange/20 text-orange px-2 py-0.5 rounded-full font-medium">Title: awaiting</span></div>
+        </div>
+      </div>
+      <div class="w-px h-10 bg-orange/25 my-1"></div>
+      <div class="flow-step w-full" data-fi="3">
+        <div class="bg-white border border-cream3 rounded-3xl p-5 shadow-md max-w-md mx-auto card-lift">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z"/></svg></div>
+            <div><p class="font-bold text-sm text-ink">Post-Call CRM Agent</p><span class="text-xs text-orange font-semibold uppercase tracking-wide">Auto-filling</span></div>
+            <div class="ml-auto w-2 h-2 rounded-full bg-orange pd"></div>
+          </div>
+          <p class="text-sm text-muted">Call ended. CRM updated, follow-up tasks created, deal stage logged automatically.</p>
+          <div class="mt-3 flex gap-2"><span class="text-xs bg-green-50 border border-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">CRM Updated</span><span class="text-xs bg-green-50 border border-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Tasks Created</span></div>
+        </div>
+      </div>
+      <div class="w-px h-10 bg-green-300/50 my-1"></div>
+      <div class="flow-step w-full" data-fi="4">
+        <div class="bg-ink rounded-2xl px-6 py-4 flex items-center gap-3 max-w-xs mx-auto shadow-lg">
+          <div class="w-8 h-8 rounded-xl bg-green-500 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></div>
+          <div><p class="font-bold text-white text-sm">Deal Closed!</p><p class="text-white/50 text-xs">CRM updated · All parties confirmed · $0 TC cost</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-14 reveal">
+      <a href="#book" class="btn-s cursor-pointer inline-flex items-center gap-2 bg-orange hover:bg-orh text-white font-bold px-8 py-4 rounded-2xl transition-all hover:shadow-xl hover:shadow-orange/30 focus:outline-none focus:ring-2 focus:ring-orange">
+        Build This For My Business <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="py-28 px-6 bg-cream2">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16">
+      <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange mb-4 reveal">Who It's For</p>
+      <h2 class="font-sans font-black text-4xl md:text-5xl text-ink leading-[1.05] reveal blur-in d1">Built For Agents Who Are <span style="color:#E0550A">Tired of<br/>Being the Bottleneck</span></h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white border border-cream3 rounded-3xl p-8 card-oh reveal">
+        <div class="w-11 h-11 rounded-2xl bg-orl flex items-center justify-center mb-5"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>
+        <h3 class="font-bold text-xl text-ink mb-2">Solo Agents (1–5 deals/month)</h3>
+        <p class="text-muted text-sm italic mb-5 leading-relaxed">"You're the agent, TC, admin, and closer all at once. The Deal Machine gives you your afternoons back."</p>
+        <div class="space-y-2">
+          <div class="flex items-start gap-2"><svg class="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg><span class="text-sm text-muted">Manually tracking every deadline</span></div>
+          <div class="flex items-start gap-2"><svg class="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg><span class="text-sm text-muted">$400 TC invoice every single deal</span></div>
+          <div class="flex items-start gap-2"><svg class="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg><span class="text-sm text-muted">CRM that's never actually up to date</span></div>
+        </div>
+      </div>
+      <div class="bg-white border border-cream3 rounded-3xl p-8 card-oh reveal d1">
+        <div class="w-11 h-11 rounded-2xl bg-orl flex items-center justify-center mb-5"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+        <h3 class="font-bold text-xl text-ink mb-2">Growing Agents (6–10 deals/month)</h3>
+        <p class="text-muted text-sm italic mb-5 leading-relaxed">"Volume is picking up but TC costs are eating your margin. Flat-rate automation changes that math."</p>
+        <div class="space-y-2">
+          <div class="flex items-start gap-2"><svg class="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg><span class="text-sm text-muted">TC costs scaling linearly with growth</span></div>
+          <div class="flex items-start gap-2"><svg class="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg><span class="text-sm text-muted">Inconsistent processes deal to deal</span></div>
+          <div class="flex items-start gap-2"><svg class="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg><span class="text-sm text-muted">Hours lost to paperwork every week</span></div>
+        </div>
+      </div>
+      <div class="bg-white border border-cream3 rounded-3xl p-8 card-oh reveal d2">
+        <div class="w-11 h-11 rounded-2xl bg-orl flex items-center justify-center mb-5"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg></div>
+        <h3 class="font-bold text-xl text-ink mb-2">Top Producers (10+ deals/month)</h3>
+        <p class="text-muted text-sm italic mb-5 leading-relaxed">"You've built volume. Without systems, growth becomes chaos. Autify standardizes every deal."</p>
+        <div class="space-y-2">
+          <div class="flex items-start gap-2"><svg class="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg><span class="text-sm text-muted">Multiple TCs, zero visibility</span></div>
+          <div class="flex items-start gap-2"><svg class="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg><span class="text-sm text-muted">Can't scale without scaling costs</span></div>
+          <div class="flex items-start gap-2"><svg class="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg><span class="text-sm text-muted">Every deal runs differently</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="text-center text-muted text-lg mt-10 reveal">What we all have in common: <strong class="text-orange">Transaction work that depends on you having time…<br/>doesn't get done.</strong></p>
+    <div class="text-center mt-7 reveal d1"><a href="#book" class="btn-s cursor-pointer inline-flex items-center gap-2 bg-orange hover:bg-orh text-white font-bold px-8 py-4 rounded-2xl transition-all hover:shadow-xl hover:shadow-orange/30 focus:outline-none focus:ring-2 focus:ring-orange">Get My Free Strategy Call <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></a></div>
+  </div>
+</section>
+
+<!-- THE DEAL MACHINE 3 COMPONENTS -->
+<section class="py-14 px-6 relative overflow-hidden" id="deal-machine">
+  <div class="glow-spot glow-orange w-[500px] h-[500px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-40"></div>
+  <div class="max-w-6xl mx-auto relative">
+    <div class="text-center mb-10">
+      <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange mb-3 reveal">The Bundle</p>
+      <h2 class="font-display font-bold text-4xl md:text-5xl text-ink leading-[1.1] mb-3 reveal blur-in d1">The Deal Machine</h2>
+      <p class="text-muted text-lg max-w-2xl mx-auto reveal d2">Three AI systems. One flat price. Zero TC invoices.</p>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div class="bg-white border border-cream3 rounded-[1.75rem] p-6 flex flex-col card-lift reveal scale-up">
+        <div class="w-11 h-11 rounded-xl bg-orl flex items-center justify-center mb-4"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg></div>
+        <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange/50 mb-1.5">Component 01</div>
+        <h3 class="font-display font-bold text-xl text-ink mb-3 leading-tight">AI Transaction Coordinator</h3>
+        <p class="text-muted text-sm leading-relaxed flex-1">Tracks every deadline, sends reminders to lenders, title, and inspectors, files your disclosures, and escalates only when a human decision is needed. Your TC — without the $400 invoice.</p>
+        <div class="mt-5 space-y-2">
+          <div class="flex items-center gap-2 text-sm text-muted"><svg class="w-4 h-4 text-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Deadline tracking & automated reminders</div>
+          <div class="flex items-center gap-2 text-sm text-muted"><svg class="w-4 h-4 text-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Document checklist & filing automation</div>
+          <div class="flex items-center gap-2 text-sm text-muted"><svg class="w-4 h-4 text-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Multi-party communication routing</div>
+        </div>
+      </div>
+      <div class="bg-orange rounded-[1.75rem] p-6 flex flex-col shadow-xl shadow-orange/30 reveal scale-up d1">
+        <div class="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center mb-4"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+        <div class="text-xs font-bold uppercase tracking-[0.2em] text-white/45 mb-1.5">Component 02</div>
+        <h3 class="font-display font-bold text-xl text-white mb-3 leading-tight">Multi-Party Deal Status Hub</h3>
+        <p class="text-white/75 text-sm leading-relaxed flex-1">A real-time dashboard your buyer, seller, lender, title, and co-agent all share. Everyone sees exactly where the deal stands. You stop being the middleman for every update.</p>
+        <div class="mt-5 space-y-2">
+          <div class="flex items-center gap-2 text-sm text-white/90"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Role-based access for all parties</div>
+          <div class="flex items-center gap-2 text-sm text-white/90"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Automated milestone notifications</div>
+          <div class="flex items-center gap-2 text-sm text-white/90"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>SMS + email push updates</div>
+        </div>
+      </div>
+      <div class="bg-white border border-cream3 rounded-[1.75rem] p-6 flex flex-col card-lift reveal scale-up d2">
+        <div class="w-11 h-11 rounded-xl bg-orl flex items-center justify-center mb-4"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z"/></svg></div>
+        <div class="text-xs font-bold uppercase tracking-[0.2em] text-orange/50 mb-1.5">Component 03</div>
+        <h3 class="font-display font-bold text-xl text-ink mb-3 leading-tight">Post-Call CRM Auto-Fill Agent</h3>
+        <p class="text-muted text-sm leading-relaxed flex-1">After every call the AI extracts key details, updates your CRM fields, creates follow-up tasks, and logs the deal stage. You hang up. It handles the rest.</p>
+        <div class="mt-5 space-y-2">
+          <div class="flex items-center gap-2 text-sm text-muted"><svg class="w-4 h-4 text-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Auto-transcription & detail extraction</div>
+          <div class="flex items-center gap-2 text-sm text-muted"><svg class="w-4 h-4 text-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Follow Up Boss, KVCore, HubSpot</div>
+          <div class="flex items-center gap-2 text-sm text-muted"><svg class="w-4 h-4 text-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Follow-up task creation & scheduling</div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-9 reveal d3">
+      <a href="#book" class="cursor-pointer inline-flex items-center gap-3 bg-ink hover:bg-ink/85 text-white font-bold px-8 py-4 rounded-2xl transition-colors hover:shadow-xl hover:shadow-ink/20 focus:outline-none focus:ring-2 focus:ring-ink focus:ring-offset-2">
+        <svg class="w-5 h-5 text-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Activate My Deal Machine
+      </a>
+      <p class="text-muted text-sm mt-3 reveal">Free 30-min call. Live in 72 hours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASES GRID -->
+<section class="py-28 px-6 bg-cream2 relative overflow-hidden" id="use-cases">
+  <div class="glow-spot glow-orange w-[700px] h-64 top-0 left-1/2 -translate-x-1/2 opacity-50"></div>
+  <div class="max-w-6xl mx-auto relative">
+    <div class="text-center mb-16">
+      <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange mb-4 reveal">Output-Focused</p>
+      <h2 class="font-sans font-black text-4xl md:text-5xl text-ink leading-[1.05] reveal blur-in d1">Everything Your Deal Needs</h2>
+      <p class="text-muted text-xl mt-4 reveal d2">Tangible automations you can deploy today.</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <!-- 1 — Transaction Coordination -->
+      <div class="flip-card h-52 reveal" onclick="this.classList.toggle('flipped')" role="button" aria-label="Transaction Coordination — click to flip">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="w-11 h-11 rounded-2xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+            <h3 class="font-bold text-ink text-base leading-snug">Transaction Coordination</h3>
+            <span class="flip-hint">tap to see details <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="flip-back">
+            <p class="text-xs font-bold text-white/50 uppercase tracking-widest mb-4">Transaction Coordination</p>
+            <div class="space-y-2.5 text-sm text-white/90">
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Deadline calendar management</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Contract milestone tracking</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Contingency date alerts</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Inspection period reminders</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 — Multi-Party Communication -->
+      <div class="flip-card h-52 reveal d1" onclick="this.classList.toggle('flipped')" role="button" aria-label="Multi-Party Communication — click to flip">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="w-11 h-11 rounded-2xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg></div>
+            <h3 class="font-bold text-ink text-base leading-snug">Multi-Party Communication</h3>
+            <span class="flip-hint">tap to see details <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="flip-back">
+            <p class="text-xs font-bold text-white/50 uppercase tracking-widest mb-4">Multi-Party Communication</p>
+            <div class="space-y-2.5 text-sm text-white/90">
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Buyer &amp; seller updates</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Lender coordination</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Title company follow-ups</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Co-agent status sharing</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 — CRM Auto-Fill -->
+      <div class="flip-card h-52 reveal d2" onclick="this.classList.toggle('flipped')" role="button" aria-label="CRM Auto-Fill — click to flip">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="w-11 h-11 rounded-2xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z"/></svg></div>
+            <h3 class="font-bold text-ink text-base leading-snug">CRM Auto-Fill</h3>
+            <span class="flip-hint">tap to see details <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="flip-back">
+            <p class="text-xs font-bold text-white/50 uppercase tracking-widest mb-4">CRM Auto-Fill</p>
+            <div class="space-y-2.5 text-sm text-white/90">
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Post-call note logging</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Deal stage updates</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Follow-up task creation</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Contact detail enrichment</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 — Document Management -->
+      <div class="flip-card h-52 reveal d1" onclick="this.classList.toggle('flipped')" role="button" aria-label="Document Management — click to flip">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="w-11 h-11 rounded-2xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+            <h3 class="font-bold text-ink text-base leading-snug">Document Management</h3>
+            <span class="flip-hint">tap to see details <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="flip-back">
+            <p class="text-xs font-bold text-white/50 uppercase tracking-widest mb-4">Document Management</p>
+            <div class="space-y-2.5 text-sm text-white/90">
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Disclosure packet tracking</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Signature follow-ups</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Addendum management</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Document checklist filing</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5 — Deal Status Hub -->
+      <div class="flip-card h-52 reveal d2" onclick="this.classList.toggle('flipped')" role="button" aria-label="Deal Status Hub — click to flip">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="w-11 h-11 rounded-2xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>
+            <h3 class="font-bold text-ink text-base leading-snug">Deal Status Hub</h3>
+            <span class="flip-hint">tap to see details <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="flip-back">
+            <p class="text-xs font-bold text-white/50 uppercase tracking-widest mb-4">Deal Status Hub</p>
+            <div class="space-y-2.5 text-sm text-white/90">
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Real-time client dashboards</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Milestone progress tracking</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Party-specific view access</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Automated status broadcasts</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 — Lender & Title Follow-Ups -->
+      <div class="flip-card h-52 reveal d3" onclick="this.classList.toggle('flipped')" role="button" aria-label="Lender &amp; Title Follow-Ups — click to flip">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="w-11 h-11 rounded-2xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+            <h3 class="font-bold text-ink text-base leading-snug">Lender &amp; Title Follow-Ups</h3>
+            <span class="flip-hint">tap to see details <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="flip-back">
+            <p class="text-xs font-bold text-white/50 uppercase tracking-widest mb-4">Lender &amp; Title Follow-Ups</p>
+            <div class="space-y-2.5 text-sm text-white/90">
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Loan condition chasing</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Clear-to-close monitoring</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Title search tracking</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Wire instruction routing</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7 — Client Status Notifications -->
+      <div class="flip-card h-52 reveal d2" onclick="this.classList.toggle('flipped')" role="button" aria-label="Client Status Notifications — click to flip">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="w-11 h-11 rounded-2xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg></div>
+            <h3 class="font-bold text-ink text-base leading-snug">Client Status Notifications</h3>
+            <span class="flip-hint">tap to see details <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="flip-back">
+            <p class="text-xs font-bold text-white/50 uppercase tracking-widest mb-4">Client Status Notifications</p>
+            <div class="space-y-2.5 text-sm text-white/90">
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Automated SMS updates</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Email milestone alerts</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Inspection result summaries</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Closing date confirmations</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8 — Post-Close Sequences -->
+      <div class="flip-card h-52 reveal d3" onclick="this.classList.toggle('flipped')" role="button" aria-label="Post-Close Sequences — click to flip">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="w-11 h-11 rounded-2xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg></div>
+            <h3 class="font-bold text-ink text-base leading-snug">Post-Close Sequences</h3>
+            <span class="flip-hint">tap to see details <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="flip-back">
+            <p class="text-xs font-bold text-white/50 uppercase tracking-widest mb-4">Post-Close Sequences</p>
+            <div class="space-y-2.5 text-sm text-white/90">
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Review request automation</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Referral follow-up campaigns</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Anniversary check-in flows</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Sphere re-engagement</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9 — Custom Automations -->
+      <div class="flip-card h-52 reveal d4" onclick="this.classList.toggle('flipped')" role="button" aria-label="Custom Automations — click to flip">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="w-11 h-11 rounded-2xl bg-orl flex items-center justify-center flex-shrink-0"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+            <h3 class="font-bold text-ink text-base leading-snug">Custom Automations</h3>
+            <span class="flip-hint">tap to see details <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></span>
+          </div>
+          <div class="flip-back">
+            <p class="text-xs font-bold text-white/50 uppercase tracking-widest mb-4">Custom Automations</p>
+            <div class="space-y-2.5 text-sm text-white/90">
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Zapier / Make integrations</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Bespoke workflow builds</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>CRM custom field mapping</p>
+              <p class="flex items-center gap-2.5"><svg class="w-3.5 h-3.5 text-white/50 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Whatever needs automating</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <p class="text-center text-muted mt-7 reveal">...and much more.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     AI CONSULTANT CHAT
+════════════════════════════════════════════════════════════ -->
+<section class="py-28 px-6 bg-cream relative overflow-hidden" id="consultant">
+  <div class="glow-spot glow-warm w-[500px] h-[500px] -bottom-20 -right-20 opacity-60"></div>
+  <div class="max-w-6xl mx-auto">
+    <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
+
+      <!-- Left: Steps -->
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange mb-4 reveal">Common Questions</p>
+        <h2 class="font-sans font-black text-4xl md:text-5xl text-ink leading-[1.05] mb-6 reveal d1">
+          Still Have<br/>Questions? <em class="not-italic text-orange">Ask.</em>
+        </h2>
+        <p class="text-muted text-lg leading-relaxed mb-10 reveal d2">Pick a common question below or type your own. For a real conversation about your specific workflow, book a free 30-minute call — that's where we can actually map out the details.</p>
+        <div class="space-y-6">
+          <div class="flex gap-5 reveal d2">
+            <div class="w-10 h-10 rounded-2xl bg-orange flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span class="font-bold text-white text-sm">1</span>
+            </div>
+            <div>
+              <h4 class="font-bold text-ink mb-1">Ask your question</h4>
+              <p class="text-muted text-sm leading-relaxed">Pick a common question or type your own — about pricing, CRM compatibility, setup, or anything else.</p>
+            </div>
+          </div>
+          <div class="flex gap-5 reveal d3">
+            <div class="w-10 h-10 rounded-2xl bg-orange flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span class="font-bold text-white text-sm">2</span>
+            </div>
+            <div>
+              <h4 class="font-bold text-ink mb-1">Get a straight answer</h4>
+              <p class="text-muted text-sm leading-relaxed">No fluff. Honest answers about what The Deal Machine does and doesn't do.</p>
+            </div>
+          </div>
+          <div class="flex gap-5 reveal d4">
+            <div class="w-10 h-10 rounded-2xl bg-orange flex items-center justify-center flex-shrink-0 mt-0.5">
+              <span class="font-bold text-white text-sm">3</span>
+            </div>
+            <div>
+              <h4 class="font-bold text-ink mb-1">Book a real conversation</h4>
+              <p class="text-muted text-sm leading-relaxed">Ready to go deeper? Book a free strategy call and we'll walk through your exact workflow together.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Chat Interface -->
+      <div class="reveal d1 from-right">
+        <div class="bg-white border border-cream3 rounded-[2rem] shadow-xl shadow-ink/5 overflow-hidden" style="min-height:520px;display:flex;flex-direction:column">
+          <!-- Chat header -->
+          <div class="bg-ink px-6 py-4 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-orange flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
+            </div>
+            <div>
+              <div class="font-bold text-white text-sm">Autify — Quick Answers</div>
+              <div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-green-400"></div><span class="text-white/50 text-xs">Common questions answered instantly</span></div>
+            </div>
+          </div>
+          <!-- Chat messages -->
+          <div id="chatMessages" class="flex-1 overflow-y-auto p-5 space-y-3" style="max-height:340px">
+            <div class="cb-a">Hey. Tell me a bit about your current setup — how many deals do you close per month, and what CRM are you using? I'll walk through what The Deal Machine would look like for your specific workflow.</div>
+          </div>
+          <!-- Suggested prompts -->
+          <div id="chatSuggestions" class="px-5 pb-3 flex flex-wrap gap-2">
+            <button onclick="sendSuggestion(this)" class="suggest-btn text-xs bg-orl text-orange border border-orange/20 rounded-full px-3 py-1.5 hover:bg-orange hover:text-white transition-colors cursor-pointer">I close 4-6 deals/month using Follow Up Boss</button>
+            <button onclick="sendSuggestion(this)" class="suggest-btn text-xs bg-orl text-orange border border-orange/20 rounded-full px-3 py-1.5 hover:bg-orange hover:text-white transition-colors cursor-pointer">How much does this cost?</button>
+            <button onclick="sendSuggestion(this)" class="suggest-btn text-xs bg-orl text-orange border border-orange/20 rounded-full px-3 py-1.5 hover:bg-orange hover:text-white transition-colors cursor-pointer">What exactly does it do?</button>
+          </div>
+          <!-- Chat input -->
+          <div class="border-t border-cream3 px-4 py-3 flex gap-3 items-center">
+            <input id="chatInput" type="text" placeholder="Type a question..." class="flex-1 text-sm bg-cream rounded-xl px-4 py-2.5 text-ink placeholder:text-muted/50 outline-none focus:ring-2 focus:ring-orange/30" onkeydown="if(event.key==='Enter')sendChat()"/>
+            <button onclick="sendChat()" class="w-9 h-9 rounded-xl bg-orange flex items-center justify-center hover:bg-orh transition-colors cursor-pointer flex-shrink-0">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     BEFORE / AFTER
+════════════════════════════════════════════════════════════ -->
+<section class="py-28 px-6 bg-ink relative overflow-hidden" id="transformation">
+  <!-- top fade from cream into ink -->
+  <div class="absolute top-0 left-0 right-0 h-24 pointer-events-none" style="background:linear-gradient(to bottom,rgba(242,235,225,.08),transparent)"></div>
+  <div class="glow-spot glow-orange w-[700px] h-96 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20"></div>
+  <div class="max-w-5xl mx-auto relative">
+    <div class="text-center mb-16">
+      <p class="text-xs font-bold uppercase tracking-[0.2em] text-orm mb-4 reveal">The Transformation</p>
+      <h2 class="font-sans font-black text-4xl md:text-5xl text-white leading-[1.05] reveal blur-in d1">Your Week, Before vs. After</h2>
+    </div>
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- Before -->
+      <div class="bg-white/5 border border-white/10 rounded-[2rem] p-8 reveal">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
+            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </div>
+          <h3 class="font-bold text-white text-xl">Before Autify</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex gap-3 items-start"><div class="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></div><p class="text-white/60 text-sm leading-relaxed">Manually chasing deadlines, docs, and signatures across 6 open deals simultaneously</p></div>
+          <div class="flex gap-3 items-start"><div class="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></div><p class="text-white/60 text-sm leading-relaxed">Paying $400/deal to a human TC — $2,400/month vanishing off your commission checks</p></div>
+          <div class="flex gap-3 items-start"><div class="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></div><p class="text-white/60 text-sm leading-relaxed">Calling clients, lenders, and title every other day just to get a status update</p></div>
+          <div class="flex gap-3 items-start"><div class="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></div><p class="text-white/60 text-sm leading-relaxed">CRM notes piling up in your head, never logged, leads slipping through the cracks</p></div>
+          <div class="flex gap-3 items-start"><div class="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></div><p class="text-white/60 text-sm leading-relaxed">No bandwidth to prospect — every hour is consumed by the deals you already have</p></div>
+        </div>
+      </div>
+      <!-- After -->
+      <div class="bg-orange/10 border border-orange/25 rounded-[2rem] p-8 reveal d1">
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-10 h-10 rounded-full bg-orange flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <h3 class="font-bold text-white text-xl">After Autify</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex gap-3 items-start"><div class="w-5 h-5 rounded-full bg-orange/20 flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3 h-3 text-orange" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div><p class="text-white/85 text-sm leading-relaxed">AI handles every deadline, reminder, and follow-up automatically — on all deals at once</p></div>
+          <div class="flex gap-3 items-start"><div class="w-5 h-5 rounded-full bg-orange/20 flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3 h-3 text-orange" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div><p class="text-white/85 text-sm leading-relaxed">$297/month replaces $2,400+/month in TC fees — you keep an extra $25,000+ per year</p></div>
+          <div class="flex gap-3 items-start"><div class="w-5 h-5 rounded-full bg-orange/20 flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3 h-3 text-orange" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div><p class="text-white/85 text-sm leading-relaxed">All parties see live deal status — zero check-in calls, zero "where are we?" texts</p></div>
+          <div class="flex gap-3 items-start"><div class="w-5 h-5 rounded-full bg-orange/20 flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3 h-3 text-orange" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div><p class="text-white/85 text-sm leading-relaxed">Every call auto-logged, follow-up tasks created, CRM updated before you finish your coffee</p></div>
+          <div class="flex gap-3 items-start"><div class="w-5 h-5 rounded-full bg-orange/20 flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3 h-3 text-orange" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></div><p class="text-white/85 text-sm leading-relaxed">Freed up 15+ hours/week to prospect, close new deals, and actually live your life</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     COMPARISON TABLE
+════════════════════════════════════════════════════════════ -->
+<section class="py-28 px-6 bg-cream">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-16">
+      <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange mb-4 reveal">The Numbers</p>
+      <h2 class="font-sans font-black text-4xl md:text-5xl text-ink leading-[1.05] reveal d1">Human TC vs. The Deal Machine</h2>
+    </div>
+    <div class="bg-white border border-cream3 rounded-[2rem] overflow-hidden shadow-lg shadow-ink/5 reveal d1 overflow-x-auto">
+      <table class="w-full min-w-[520px]">
+        <thead>
+          <tr class="border-b border-cream3">
+            <th class="text-left px-8 py-5 text-sm font-bold text-muted uppercase tracking-wider w-2/5"></th>
+            <th class="px-8 py-5 text-center text-sm font-bold text-muted uppercase tracking-wider">Human TC</th>
+            <th class="px-8 py-5 text-center bg-orl text-sm font-bold text-orange uppercase tracking-wider rounded-t-xl">The Deal Machine</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-cream3">
+          <tr>
+            <td class="px-8 py-4 text-sm font-medium text-ink">Monthly cost (6 deals)</td>
+            <td class="px-8 py-4 text-center text-sm text-muted">$1,800 – $3,000</td>
+            <td class="px-8 py-4 text-center text-sm font-bold text-orange bg-orl/30">$297/mo</td>
+          </tr>
+          <tr>
+            <td class="px-8 py-4 text-sm font-medium text-ink">Available 24/7</td>
+            <td class="px-8 py-4 text-center"><svg class="w-5 h-5 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></td>
+            <td class="px-8 py-4 text-center bg-orl/30"><svg class="w-5 h-5 text-orange mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></td>
+          </tr>
+          <tr>
+            <td class="px-8 py-4 text-sm font-medium text-ink">Scales with deal volume</td>
+            <td class="px-8 py-4 text-center"><svg class="w-5 h-5 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></td>
+            <td class="px-8 py-4 text-center bg-orl/30"><svg class="w-5 h-5 text-orange mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></td>
+          </tr>
+          <tr>
+            <td class="px-8 py-4 text-sm font-medium text-ink">CRM auto-fill after calls</td>
+            <td class="px-8 py-4 text-center"><svg class="w-5 h-5 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></td>
+            <td class="px-8 py-4 text-center bg-orl/30"><svg class="w-5 h-5 text-orange mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></td>
+          </tr>
+          <tr>
+            <td class="px-8 py-4 text-sm font-medium text-ink">Shared deal status hub</td>
+            <td class="px-8 py-4 text-center text-muted text-sm">Extra cost</td>
+            <td class="px-8 py-4 text-center bg-orl/30"><svg class="w-5 h-5 text-orange mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></td>
+          </tr>
+          <tr>
+            <td class="px-8 py-4 text-sm font-medium text-ink">Setup time</td>
+            <td class="px-8 py-4 text-center text-sm text-muted">Weeks of onboarding</td>
+            <td class="px-8 py-4 text-center text-sm font-bold text-orange bg-orl/30">72 hours</td>
+          </tr>
+          <tr>
+            <td class="px-8 py-4 text-sm font-medium text-ink">No long-term contract</td>
+            <td class="px-8 py-4 text-center"><svg class="w-5 h-5 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></td>
+            <td class="px-8 py-4 text-center bg-orl/30"><svg class="w-5 h-5 text-orange mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     PRICING
+════════════════════════════════════════════════════════════ -->
+<section class="py-14 px-6 bg-cream2 relative overflow-hidden" id="pricing">
+  <div class="glow-spot glow-orange w-[500px] h-[500px] top-1/2 -right-32 -translate-y-1/2 opacity-50"></div>
+  <div class="glow-spot glow-warm w-80 h-80 top-1/2 -left-20 -translate-y-1/2 opacity-40"></div>
+  <div class="max-w-4xl mx-auto relative">
+    <div class="text-center mb-8">
+      <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange mb-3 reveal">Simple Pricing</p>
+      <h2 class="font-sans font-black text-4xl md:text-5xl text-ink leading-[1.05] reveal blur-in d1">One Bundle. Everything Included.</h2>
+      <p class="text-muted text-lg mt-3 reveal d2">No per-deal fees. No long-term contracts. Cancel any time.</p>
+    </div>
+    <!-- "Both required" callout -->
+    <div class="flex items-center gap-4 bg-orl border border-orange/20 rounded-xl px-5 py-3 mb-5 reveal">
+      <svg class="w-4 h-4 text-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <p class="text-sm text-ink"><span class="font-bold">Both fees apply to get started:</span> a one-time $497 setup + $297/month ongoing. Total first-month investment: <span class="font-bold text-orange">$794</span>.</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-5">
+      <!-- Setup fee card -->
+      <div class="bg-white border border-cream3 rounded-[1.75rem] p-6 card-lift reveal">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-muted mb-3">Step 1 — One-Time Setup</p>
+        <div class="flex items-end gap-2 mb-1.5">
+          <span class="font-sans font-black text-4xl text-ink">$497</span>
+        </div>
+        <p class="text-muted text-sm mb-5">Setup & onboarding fee</p>
+        <div class="space-y-2.5">
+          <div class="flex gap-3 items-center"><svg class="w-4 h-4 text-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><p class="text-sm text-muted">Full system build & integration with your CRM</p></div>
+          <div class="flex gap-3 items-center"><svg class="w-4 h-4 text-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><p class="text-sm text-muted">All 3 components configured for your workflow</p></div>
+          <div class="flex gap-3 items-center"><svg class="w-4 h-4 text-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><p class="text-sm text-muted">Live onboarding session included</p></div>
+          <div class="flex gap-3 items-center"><svg class="w-4 h-4 text-orange flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><p class="text-sm text-muted">Done-for-you in 72 hours or less</p></div>
+        </div>
+      </div>
+      <!-- Monthly card -->
+      <div class="bg-orange rounded-[1.75rem] p-6 shadow-xl shadow-orange/25 reveal d1">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-white/50 mb-3">Step 2 — Monthly Subscription</p>
+        <div class="flex items-end gap-2 mb-1.5">
+          <span class="font-sans font-black text-4xl text-white">$297</span>
+          <span class="text-white/60 mb-0.5">/month</span>
+        </div>
+        <p class="text-white/60 text-sm mb-5">All-inclusive subscription</p>
+        <div class="space-y-2.5">
+          <div class="flex gap-3 items-center"><svg class="w-4 h-4 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><p class="text-sm text-white/85">AI Transaction Coordinator — unlimited deals</p></div>
+          <div class="flex gap-3 items-center"><svg class="w-4 h-4 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><p class="text-sm text-white/85">Multi-Party Deal Status Hub</p></div>
+          <div class="flex gap-3 items-center"><svg class="w-4 h-4 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><p class="text-sm text-white/85">Post-Call CRM Auto-Fill Agent</p></div>
+          <div class="flex gap-3 items-center"><svg class="w-4 h-4 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><p class="text-sm text-white/85">Ongoing support & updates</p></div>
+          <div class="flex gap-3 items-center"><svg class="w-4 h-4 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg><p class="text-sm text-white/85">Cancel any time, no contract</p></div>
+        </div>
+        <a href="#book" class="block mt-5 bg-white text-orange font-bold text-sm text-center py-3 rounded-xl hover:bg-cream transition-colors cursor-pointer">Get Started — Book Your Setup Call</a>
+      </div>
+    </div>
+    <p class="text-center text-muted text-sm mt-6 reveal">At 6 deals/month you're saving $1,500–$2,700/month vs. a human TC. The system pays for itself on the first deal.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     BOOKING CALENDAR
+════════════════════════════════════════════════════════════ -->
+<section class="py-28 px-6 bg-cream" id="book">
+  <div class="max-w-5xl mx-auto">
+    <div class="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
+
+      <!-- Left: Description -->
+      <div>
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange mb-4 reveal">Free Setup Call</p>
+        <h2 class="font-sans font-black text-4xl md:text-5xl text-ink leading-[1.05] mb-6 reveal d1">Book Your<br/>Free Strategy Call</h2>
+        <p class="text-muted text-base sm:text-lg leading-relaxed mb-6 sm:mb-10 reveal d2">30 minutes with the Autify team. We'll map your workflow, answer every question, and — if it's a fit — get you live in 72 hours.</p>
+        <div class="space-y-5 reveal d2">
+          <div class="flex gap-4 items-start">
+            <div class="w-9 h-9 rounded-xl bg-orl flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+            <div><h4 class="font-bold text-ink text-sm mb-0.5">30-Minute Session</h4><p class="text-muted text-sm">No pressure. Just a real conversation about your business.</p></div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="w-9 h-9 rounded-xl bg-orl flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+            <div><h4 class="font-bold text-ink text-sm mb-0.5">Custom Automation Map</h4><p class="text-muted text-sm">We'll build a tailored plan for your specific deal workflow.</p></div>
+          </div>
+          <div class="flex gap-4 items-start">
+            <div class="w-9 h-9 rounded-xl bg-orl flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-5 h-5 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+            <div><h4 class="font-bold text-ink text-sm mb-0.5">Live in 72 Hours</h4><p class="text-muted text-sm">Decide to proceed and we build everything for you — fast.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Calendar Widget -->
+      <div class="reveal d1 from-right">
+        <div class="bg-white border border-cream3 rounded-[2rem] shadow-xl shadow-ink/5 overflow-hidden">
+          <!-- Step 1: Calendar -->
+          <div id="calStep1" class="p-7">
+            <div class="flex items-center justify-between mb-6">
+              <button id="prevMonth" onclick="changeMonth(-1)" class="w-9 h-9 rounded-xl hover:bg-cream flex items-center justify-center text-muted hover:text-ink transition-colors cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+              </button>
+              <h3 id="monthLabel" class="font-bold text-ink text-base"></h3>
+              <button id="nextMonth" onclick="changeMonth(1)" class="w-9 h-9 rounded-xl hover:bg-cream flex items-center justify-center text-muted hover:text-ink transition-colors cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+            <div class="grid grid-cols-7 mb-2">
+              <div class="text-center text-xs font-bold text-muted py-1">Su</div>
+              <div class="text-center text-xs font-bold text-muted py-1">Mo</div>
+              <div class="text-center text-xs font-bold text-muted py-1">Tu</div>
+              <div class="text-center text-xs font-bold text-muted py-1">We</div>
+              <div class="text-center text-xs font-bold text-muted py-1">Th</div>
+              <div class="text-center text-xs font-bold text-muted py-1">Fr</div>
+              <div class="text-center text-xs font-bold text-muted py-1">Sa</div>
+            </div>
+            <div id="calGrid" class="grid grid-cols-7 gap-1"></div>
+            <p class="text-xs text-muted text-center mt-4">Times shown in your local timezone</p>
+          </div>
+          <!-- Step 2: Time Slots -->
+          <div id="calStep2" class="p-7 hidden">
+            <div class="flex items-center gap-3 mb-6">
+              <button onclick="showStep(1)" class="text-muted hover:text-ink transition-colors cursor-pointer"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+              <h3 class="font-bold text-ink text-base" id="selectedDateLabel"></h3>
+            </div>
+            <p class="text-sm text-muted mb-4">Select a time:</p>
+            <div id="timeSlots" class="grid grid-cols-2 gap-2.5 mb-6"></div>
+            <button id="nextBtn" onclick="showStep(3)" class="hidden w-full bg-orange text-white font-bold py-3.5 rounded-xl hover:bg-orh transition-colors cursor-pointer">Next &rarr;</button>
+          </div>
+          <!-- Step 3: Form -->
+          <div id="calStep3" class="p-7 hidden">
+            <div class="flex items-center gap-3 mb-6">
+              <button onclick="showStep(2)" class="text-muted hover:text-ink transition-colors cursor-pointer"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+              <h3 class="font-bold text-ink text-base">Your Details</h3>
+            </div>
+            <div class="space-y-4">
+              <div><label class="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Full Name *</label><input id="fName" type="text" placeholder="Jane Smith" class="w-full bg-cream border border-cream3 rounded-xl px-4 py-3 text-sm text-ink placeholder:text-muted/50 outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange/40"/></div>
+              <div><label class="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Brokerage / Business *</label><input id="fBiz" type="text" placeholder="Smith Realty Group" class="w-full bg-cream border border-cream3 rounded-xl px-4 py-3 text-sm text-ink placeholder:text-muted/50 outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange/40"/></div>
+              <div><label class="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Phone *</label><input id="fPhone" type="tel" placeholder="+1 (555) 000-0000" class="w-full bg-cream border border-cream3 rounded-xl px-4 py-3 text-sm text-ink placeholder:text-muted/50 outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange/40"/></div>
+              <div><label class="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Email *</label><input id="fEmail" type="email" placeholder="jane@smithrealty.com" class="w-full bg-cream border border-cream3 rounded-xl px-4 py-3 text-sm text-ink placeholder:text-muted/50 outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange/40"/></div>
+              <div><label class="block text-xs font-bold text-muted uppercase tracking-wider mb-1.5">Anything to share beforehand?</label><textarea id="fNotes" rows="2" placeholder="CRM you use, # of deals/month, biggest bottleneck..." class="w-full bg-cream border border-cream3 rounded-xl px-4 py-3 text-sm text-ink placeholder:text-muted/50 outline-none focus:ring-2 focus:ring-orange/30 focus:border-orange/40 resize-none"></textarea></div>
+            </div>
+            <!--
+              SECURITY: Honeypot field — hidden from real users via CSS,
+              not via type="hidden" so bots that auto-fill all inputs trigger it.
+              Checked in submitBooking(); any value = bot, silently rejected.
+            -->
+            <div style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">
+              <label for="fWebsite">Website</label>
+              <input id="fWebsite" name="website" type="text" tabindex="-1" autocomplete="off"/>
+            </div>
+            <button id="submitBtn" onclick="submitBooking()" class="mt-6 w-full bg-orange text-white font-bold py-3.5 rounded-xl hover:bg-orh transition-colors cursor-pointer">Confirm My Spot</button>
+          </div>
+          <!-- Step 4: Confirmation -->
+          <div id="calStep4" class="p-10 hidden text-center">
+            <div class="w-16 h-16 rounded-full bg-orange mx-auto flex items-center justify-center mb-5">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <h3 class="font-display font-bold text-2xl text-ink mb-3">You're Booked!</h3>
+            <p id="confirmMsg" class="text-muted text-sm leading-relaxed mb-5"></p>
+            <a id="gcalBtn" href="#" target="_blank" rel="noopener" class="inline-flex items-center justify-center gap-2.5 bg-orl border border-orange/25 text-orange font-bold text-sm px-6 py-3 rounded-xl hover:bg-orange hover:text-white transition-colors cursor-pointer mb-4">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              Add to Google Calendar
+            </a>
+            <p class="text-xs text-muted">Check your email for a confirmation. We'll see you then.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     TESTIMONIALS
+════════════════════════════════════════════════════════════ -->
+<section class="py-28 px-6 bg-cream2 relative overflow-hidden" id="testimonials">
+  <div class="glow-spot glow-orange w-[600px] h-60 top-0 left-1/2 -translate-x-1/2 opacity-40"></div>
+  <div class="max-w-6xl mx-auto relative">
+    <div class="text-center mb-16">
+      <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange mb-4 reveal">Real Results</p>
+      <h2 class="font-sans font-black text-4xl md:text-5xl text-ink leading-[1.05] reveal blur-in d1">Agents Who Got Their Time Back</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="bg-white border border-cream3 rounded-[2rem] p-7 card-lift reveal scale-up">
+        <div class="flex gap-1 mb-5">
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="text-ink text-sm leading-relaxed mb-6">"I used to spend every Sunday night prepping TC updates for the week. Now I wake up Monday and it's all done. The Deal Machine paid for itself in the first month — I saved over $2,100 in TC fees alone."</p>
+        <div class="flex items-center gap-3 pt-4 border-t border-cream3">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-white text-sm" style="background:linear-gradient(135deg,#E0550A,#C4460A)">SM</div>
+          <div>
+            <div class="font-bold text-ink text-sm">Sarah M.</div>
+            <div class="text-muted text-xs">Phoenix, AZ · ~5 deals/mo</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white border border-cream3 rounded-[2rem] p-7 card-lift reveal d1">
+        <div class="flex gap-1 mb-5">
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="text-ink text-sm leading-relaxed mb-6">"My clients keep asking how I'm so on top of everything. It's Autify. The deal status hub alone has cut my inbound questions in half. Buyers and sellers just log in and see everything themselves."</p>
+        <div class="flex items-center gap-3 pt-4 border-t border-cream3">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-white text-sm" style="background:linear-gradient(135deg,#7B5EA7,#5B3F8A)">MR</div>
+          <div>
+            <div class="font-bold text-ink text-sm">Marcus R.</div>
+            <div class="text-muted text-xs">Atlanta, GA · ~7 deals/mo</div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white border border-cream3 rounded-[2rem] p-7 card-lift reveal d2">
+        <div class="flex gap-1 mb-5">
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <svg class="w-4 h-4 text-orm" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        </div>
+        <p class="text-ink text-sm leading-relaxed mb-6">"I was skeptical AI could replace my TC — but it's not replacing her, it's replacing all the repetitive busywork she charged me for. The post-call CRM fill is genuinely magic. I haven't manually updated a contact in 6 weeks."</p>
+        <div class="flex items-center gap-3 pt-4 border-t border-cream3">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-white text-sm" style="background:linear-gradient(135deg,#2D8A6E,#1E6B54)">JK</div>
+          <div>
+            <div class="font-bold text-ink text-sm">Jamie K.</div>
+            <div class="text-muted text-xs">Denver, CO · ~3 deals/mo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     FAQ
+════════════════════════════════════════════════════════════ -->
+<section class="py-28 px-6 bg-cream" id="faq">
+  <div class="max-w-2xl mx-auto">
+    <div class="text-center mb-16">
+      <p class="text-xs font-bold uppercase tracking-[0.2em] text-orange mb-4 reveal">FAQ</p>
+      <h2 class="font-sans font-black text-4xl md:text-5xl text-ink leading-[1.05] reveal d1">Common Questions</h2>
+    </div>
+    <div id="faqList" class="space-y-3">
+      <div class="faq-item bg-white border border-cream3 rounded-2xl overflow-hidden reveal">
+        <button class="faq-q w-full text-left px-7 py-5 flex items-center justify-between cursor-pointer hover:bg-cream/60 transition-colors" onclick="toggleFaq(this)">
+          <span class="font-bold text-ink text-sm pr-4">Does this replace my existing CRM?</span>
+          <svg class="faq-arrow w-5 h-5 text-orange flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-ans max-h-0 overflow-hidden transition-all duration-300"><p class="px-7 pb-5 text-sm text-muted leading-relaxed">No — The Deal Machine plugs into your existing CRM (Follow Up Boss, KVCore, HubSpot, etc.) and enhances it. You keep using the tools you already know; we just automate the repetitive work around them.</p></div>
+      </div>
+      <div class="faq-item bg-white border border-cream3 rounded-2xl overflow-hidden reveal d1">
+        <button class="faq-q w-full text-left px-7 py-5 flex items-center justify-between cursor-pointer hover:bg-cream/60 transition-colors" onclick="toggleFaq(this)">
+          <span class="font-bold text-ink text-sm pr-4">What if I'm not tech-savvy?</span>
+          <svg class="faq-arrow w-5 h-5 text-orange flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-ans max-h-0 overflow-hidden transition-all duration-300"><p class="px-7 pb-5 text-sm text-muted leading-relaxed">That's exactly who we built this for. You don't set anything up — we do it all for you in the onboarding session. By the time you hang up from the setup call, your system is running.</p></div>
+      </div>
+      <div class="faq-item bg-white border border-cream3 rounded-2xl overflow-hidden reveal d2">
+        <button class="faq-q w-full text-left px-7 py-5 flex items-center justify-between cursor-pointer hover:bg-cream/60 transition-colors" onclick="toggleFaq(this)">
+          <span class="font-bold text-ink text-sm pr-4">How long does setup take?</span>
+          <svg class="faq-arrow w-5 h-5 text-orange flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-ans max-h-0 overflow-hidden transition-all duration-300"><p class="px-7 pb-5 text-sm text-muted leading-relaxed">72 hours from your onboarding call. We configure all three components, integrate with your CRM and communication tools, and deliver a fully working system — not a template you have to figure out.</p></div>
+      </div>
+      <div class="faq-item bg-white border border-cream3 rounded-2xl overflow-hidden reveal d1">
+        <button class="faq-q w-full text-left px-7 py-5 flex items-center justify-between cursor-pointer hover:bg-cream/60 transition-colors" onclick="toggleFaq(this)">
+          <span class="font-bold text-ink text-sm pr-4">Is there a contract or minimum commitment?</span>
+          <svg class="faq-arrow w-5 h-5 text-orange flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-ans max-h-0 overflow-hidden transition-all duration-300"><p class="px-7 pb-5 text-sm text-muted leading-relaxed">No contract, no minimum. Month-to-month subscription. The $497 setup is a one-time fee — after that it's $297/month, cancel any time. We're confident you'll stay because you'll see the results within the first deal.</p></div>
+      </div>
+      <div class="faq-item bg-white border border-cream3 rounded-2xl overflow-hidden reveal d2">
+        <button class="faq-q w-full text-left px-7 py-5 flex items-center justify-between cursor-pointer hover:bg-cream/60 transition-colors" onclick="toggleFaq(this)">
+          <span class="font-bold text-ink text-sm pr-4">Does this work if I only close 2–3 deals a month?</span>
+          <svg class="faq-arrow w-5 h-5 text-orange flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-ans max-h-0 overflow-hidden transition-all duration-300"><p class="px-7 pb-5 text-sm text-muted leading-relaxed">Absolutely. At 3 deals/month you're saving $600–$900 in TC fees while getting back 10+ hours. The system runs in the background whether you have 1 deal or 20. You grow into it — you don't grow out of it.</p></div>
+      </div>
+      <div class="faq-item bg-white border border-cream3 rounded-2xl overflow-hidden reveal d3">
+        <button class="faq-q w-full text-left px-7 py-5 flex items-center justify-between cursor-pointer hover:bg-cream/60 transition-colors" onclick="toggleFaq(this)">
+          <span class="font-bold text-ink text-sm pr-4">What CRMs do you support?</span>
+          <svg class="faq-arrow w-5 h-5 text-orange flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-ans max-h-0 overflow-hidden transition-all duration-300"><p class="px-7 pb-5 text-sm text-muted leading-relaxed">Follow Up Boss, KVCore, HubSpot, and most CRMs with API or Zapier access. On the setup call we'll confirm your stack is supported — in 95% of cases it is. If not, we tell you upfront before you commit a dollar.</p></div>
+      </div>
+      <div class="faq-item bg-white border border-cream3 rounded-2xl overflow-hidden reveal d4">
+        <button class="faq-q w-full text-left px-7 py-5 flex items-center justify-between cursor-pointer hover:bg-cream/60 transition-colors" onclick="toggleFaq(this)">
+          <span class="font-bold text-ink text-sm pr-4">Is this actually compliant with real estate regulations and MLS rules?</span>
+          <svg class="faq-arrow w-5 h-5 text-orange flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-ans max-h-0 overflow-hidden transition-all duration-300"><p class="px-7 pb-5 text-sm text-muted leading-relaxed">Yes. The Deal Machine automates coordination, communication, and data entry — tasks that don't require a real estate license. It does not draft contracts, represent parties, or make binding decisions. You remain the licensed agent of record on every transaction. We always recommend confirming any new tool with your broker, but we've had zero compliance issues across all current clients. We're happy to walk through the specifics on your setup call.</p></div>
+      </div>
+      <div class="faq-item bg-white border border-cream3 rounded-2xl overflow-hidden reveal d5">
+        <button class="faq-q w-full text-left px-7 py-5 flex items-center justify-between cursor-pointer hover:bg-cream/60 transition-colors" onclick="toggleFaq(this)">
+          <span class="font-bold text-ink text-sm pr-4">What happens if the AI makes a mistake on a deadline?</span>
+          <svg class="faq-arrow w-5 h-5 text-orange flex-shrink-0 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="faq-ans max-h-0 overflow-hidden transition-all duration-300"><p class="px-7 pb-5 text-sm text-muted leading-relaxed">The system is designed with redundancy and human-in-the-loop checkpoints for anything deadline-critical. You receive a daily summary of all active deal milestones, and the AI flags anything it's uncertain about for your review rather than acting unilaterally. You're always the final sign-off on time-sensitive actions. That said, like any system — human or AI — it's not infallible, which is why we build in those review checkpoints. We're upfront about that from day one.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     FINAL CTA
+════════════════════════════════════════════════════════════ -->
+<section class="py-16 sm:py-32 px-6 bg-ink relative overflow-hidden">
+  <!-- background orbs -->
+  <div class="absolute top-0 right-0 w-96 h-96 rounded-full" style="background:radial-gradient(circle,rgba(224,85,10,.15) 0%,transparent 70%);pointer-events:none"></div>
+  <div class="absolute bottom-0 left-0 w-80 h-80 rounded-full" style="background:radial-gradient(circle,rgba(245,155,58,.08) 0%,transparent 70%);pointer-events:none"></div>
+  <div class="max-w-3xl mx-auto text-center relative">
+    <p class="text-xs font-bold uppercase tracking-[0.2em] text-orm mb-6 reveal">Ready to Automate?</p>
+    <h2 class="font-sans font-black text-3xl sm:text-5xl md:text-6xl text-white leading-[1.0] tracking-tight mb-8 reveal d1">
+      Stop Drowning.<br/>
+      <span class="text-orange">Start Closing.</span>
+    </h2>
+    <p class="text-white/60 text-base sm:text-xl leading-relaxed mb-12 reveal d2">Book a free 30-minute strategy call. We'll map your exact workflow and show you what The Deal Machine would save you — in time and money — starting this month.</p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center reveal d2">
+      <a href="#book" class="inline-flex items-center justify-center gap-2.5 bg-orange text-white font-bold px-8 py-4 rounded-2xl hover:bg-orh transition-colors text-base cursor-pointer">
+        Book Your Free Setup Call
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+      <a href="#how-it-works" class="inline-flex items-center justify-center gap-2 border border-white/20 text-white/80 font-semibold px-8 py-4 rounded-2xl hover:bg-white/5 hover:border-white/40 transition-colors text-base cursor-pointer">
+        See How It Works
+      </a>
+    </div>
+    <p class="text-white/30 text-sm mt-8 reveal">No commitment required. Call is 100% free.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════════ -->
+<footer class="bg-ink border-t border-white/8 py-14 px-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+      <div>
+        <div class="font-display font-bold text-xl text-white tracking-wide mb-2">Autify</div>
+        <p class="text-white/35 text-sm max-w-xs">Done-for-you AI automation systems for solo real estate agents.</p>
+      </div>
+      <div class="flex flex-wrap gap-6 text-sm">
+        <a href="#how-it-works" class="text-white/40 hover:text-white/80 transition-colors cursor-pointer">How It Works</a>
+        <a href="#deal-machine" class="text-white/40 hover:text-white/80 transition-colors cursor-pointer">The Deal Machine</a>
+        <a href="#pricing" class="text-white/40 hover:text-white/80 transition-colors cursor-pointer">Pricing</a>
+        <a href="#faq" class="text-white/40 hover:text-white/80 transition-colors cursor-pointer">FAQ</a>
+        <a href="#book" class="text-orange hover:text-orm transition-colors cursor-pointer font-semibold">Book a Call</a>
+      </div>
+    </div>
+    <div class="border-t border-white/8 mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/25">
+      <p>&copy; 2026 Autify. All rights reserved.</p>
+      <p>The Deal Machine &mdash; $297/month + $497 setup</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════════════ -->
+<script>
+/* ── Scroll Reveal ── */
+const ro = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('visible');ro.unobserve(e.target);}
+  });
+},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+/* ── Line-grow connector reveal ── */
+const lo = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');lo.unobserve(e.target);}});
+},{threshold:.3});
+document.querySelectorAll('.line-grow').forEach(el=>lo.observe(el));
+
+/* ── Subtle parallax on glow spots ── */
+(function(){
+  const glows=document.querySelectorAll('.glow-spot');
+  if(!glows.length)return;
+  let ticking=false;
+  window.addEventListener('scroll',()=>{
+    if(ticking)return;ticking=true;
+    requestAnimationFrame(()=>{
+      const sy=window.scrollY;
+      glows.forEach((g,i)=>{
+        const dir=i%2===0?1:-1;
+        const speed=0.04+((i%3)*0.015);
+        g.style.transform=(g.style.transform||'').replace(/translateY\([^)]*\)/,'')+`translateY(${sy*speed*dir}px)`;
+      });
+      ticking=false;
+    });
+  });
+})();
+
+/* ── Flowchart Step Reveals ── */
+const fo = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('vis');fo.unobserve(e.target);}
+  });
+},{threshold:.2});
+document.querySelectorAll('.flow-step').forEach(el=>fo.observe(el));
+
+/* ── Animated Counters ── */
+function animateCount(el){
+  const target=+el.dataset.target,dur=1800,step=20;
+  let cur=0;
+  const inc=target/(dur/step);
+  const t=setInterval(()=>{
+    cur=Math.min(cur+inc,target);
+    el.textContent=Math.floor(cur).toLocaleString()+(el.dataset.suffix||'');
+    if(cur>=target)clearInterval(t);
+  },step);
+}
+const co=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){animateCount(e.target);co.unobserve(e.target);}});
+},{threshold:.5});
+document.querySelectorAll('[data-target]').forEach(el=>co.observe(el));
+
+/* ── Ticker ── */
+(function(){
+  const t=document.getElementById('tickerTrack');
+  if(!t)return;
+  const unit=t.querySelector('.ticker-unit');
+  if(!unit)return;
+  let x=0,unitW=0;
+  function getUnitW(){unitW=unit.getBoundingClientRect().width||unit.offsetWidth;}
+  getUnitW();
+  window.addEventListener('resize',getUnitW);
+  function animate(){
+    x-=0.5;
+    if(unitW>0&&x<=-unitW)x+=unitW;
+    t.style.transform='translateX('+x+'px)';
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* ── Mobile Nav ── */
+const menuBtn=document.getElementById('menuBtn');
+const mobileMenu=document.getElementById('mobileMenu');
+if(menuBtn&&mobileMenu){
+  menuBtn.addEventListener('click',()=>{mobileMenu.classList.toggle('hidden');});
+  mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
+}
+
+/* ── Nav scroll shrink ── */
+window.addEventListener('scroll',()=>{
+  const nav=document.querySelector('nav');
+  if(nav)nav.classList.toggle('py-2',window.scrollY>60);
+});
+
+/* ── FAQ Accordion ── */
+function toggleFaq(btn){
+  const ans=btn.nextElementSibling;
+  const arrow=btn.querySelector('.faq-arrow');
+  const isOpen=ans.style.maxHeight&&ans.style.maxHeight!=='0px';
+  // close all
+  document.querySelectorAll('.faq-ans').forEach(a=>{a.style.maxHeight='0px';});
+  document.querySelectorAll('.faq-arrow').forEach(a=>{a.style.transform='';});
+  if(!isOpen){ans.style.maxHeight=ans.scrollHeight+'px';arrow.style.transform='rotate(180deg)';}
+}
+
+/* ── CALENDAR ── */
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const TIMES=['9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM','11:30 AM','1:00 PM','1:30 PM','2:00 PM','2:30 PM','3:00 PM','3:30 PM'];
+let calState={year:0,month:0,selectedDate:null,selectedTime:null};
+
+function initCal(){
+  const now=new Date();
+  calState.year=now.getFullYear();
+  calState.month=now.getMonth();
+  renderCal();
+}
+
+function renderCal(){
+  const ml=document.getElementById('monthLabel');
+  const grid=document.getElementById('calGrid');
+  if(!ml||!grid)return;
+  ml.textContent=MONTHS[calState.month]+' '+calState.year;
+  const firstDay=new Date(calState.year,calState.month,1).getDay();
+  const daysInMonth=new Date(calState.year,calState.month+1,0).getDate();
+  const today=new Date();today.setHours(0,0,0,0);
+  let html='';
+  for(let i=0;i<firstDay;i++)html+='<div></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const dt=new Date(calState.year,calState.month,d);
+    const isPast=dt<today;
+    const isWknd=dt.getDay()===0||dt.getDay()===6;
+    const sel=calState.selectedDate&&calState.selectedDate.getTime()===dt.getTime();
+    if(isPast||isWknd){
+      html+=`<div class="text-center py-2 text-sm text-muted/30 rounded-xl">${d}</div>`;
+    } else {
+      html+=`<button onclick="selectDate(${calState.year},${calState.month},${d})" class="text-center py-2 text-sm rounded-xl font-medium transition-all cursor-pointer ${sel?'bg-orange text-white shadow-md':'text-ink hover:bg-orl hover:text-orange'}">${d}</button>`;
+    }
+  }
+  grid.innerHTML=html;
+}
+
+function selectDate(y,m,d){
+  calState.selectedDate=new Date(y,m,d);
+  calState.selectedTime=null;
+  showStep(2);
+  const label=document.getElementById('selectedDateLabel');
+  if(label)label.textContent=MONTHS[m]+' '+d+', '+y;
+  renderTimeSlots();
+}
+
+function renderTimeSlots(){
+  const container=document.getElementById('timeSlots');
+  if(!container)return;
+  container.innerHTML='';
+  TIMES.forEach((t,i)=>{
+    const btn=document.createElement('button');
+    btn.className='time-slot text-sm font-medium py-3 px-4 rounded-xl border border-cream3 text-muted hover:border-orange hover:text-orange hover:bg-orl transition-all cursor-pointer';
+    btn.style.animationDelay=(i*.04)+'s';
+    btn.textContent=t;
+    btn.onclick=function(){selectTime(t,this);};
+    container.appendChild(btn);
+    requestAnimationFrame(()=>btn.style.opacity='1');
+  });
+  const nb=document.getElementById('nextBtn');
+  if(nb)nb.classList.add('hidden');
+}
+
+function selectTime(t,el){
+  calState.selectedTime=t;
+  document.querySelectorAll('.time-slot').forEach(b=>{
+    b.className='time-slot text-sm font-medium py-3 px-4 rounded-xl border border-cream3 text-muted hover:border-orange hover:text-orange hover:bg-orl transition-all cursor-pointer';
+  });
+  el.className='time-slot text-sm font-medium py-3 px-4 rounded-xl border-2 border-orange bg-orange text-white transition-all cursor-pointer';
+  const nb=document.getElementById('nextBtn');
+  if(nb)nb.classList.remove('hidden');
+}
+
+function changeMonth(dir){
+  calState.month+=dir;
+  if(calState.month>11){calState.month=0;calState.year++;}
+  if(calState.month<0){calState.month=11;calState.year--;}
+  renderCal();
+}
+
+function showStep(n){
+  [1,2,3,4].forEach(i=>{
+    const el=document.getElementById('calStep'+i);
+    if(el)el.classList.toggle('hidden',i!==n);
+  });
+  if(n===1)renderCal();
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   SECURITY UTILITIES
+   ───────────────────────────────────────────────────────────────────────── */
+
+// Strips HTML tags and enforces a max character length on any string.
+// Prevents HTML/script injection in fields sent to the EmailJS template.
+function sanitizeInput(str, max) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/<[^>]*>/g, '').trim().slice(0, max);
+}
+
+// RFC-5321-simplified email format check.
+// The browser's type="email" is UI-only; this is the JS enforcement layer.
+function isValidEmail(email) {
+  return /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/.test(email);
+}
+
+// Accepts common US/international phone formats.
+// Requires 7-15 consecutive digits after stripping formatting characters.
+function isValidPhone(phone) {
+  if (phone.length > 20) return false;
+  const digits = phone.replace(/\D/g, '');
+  return digits.length >= 7 && digits.length <= 15;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CLIENT-SIDE RATE LIMITING — form submissions
+   Why: EmailJS free tier is 200 emails/month. Without this a single visitor
+   or bot can exhaust the quota in seconds. This limits the same browser to
+   3 submissions per hour via localStorage.
+   Note: localStorage is per-browser, not per-IP. A determined actor can
+   clear storage or use multiple browsers. True IP-based rate limiting
+   requires a backend (e.g. a Cloudflare Worker proxying EmailJS). This is
+   the correct mitigation for a static-file architecture.
+───────────────────────────────────────────────────────────────────────── */
+const _RL_KEY    = 'autify_sub_ts';
+const _RL_MAX    = 3;
+const _RL_WINDOW = 60 * 60 * 1000; // 1 hour in ms
+
+function checkFormRateLimit() {
+  const now = Date.now();
+  let times = [];
+  try { times = JSON.parse(localStorage.getItem(_RL_KEY) || '[]'); } catch(e) { times = []; }
+  times = times.filter(t => now - t < _RL_WINDOW);
+  if (times.length >= _RL_MAX) {
+    const waitMin = Math.ceil((_RL_WINDOW - (now - times[0])) / 60000);
+    return { blocked: true, waitMin };
+  }
+  times.push(now);
+  try { localStorage.setItem(_RL_KEY, JSON.stringify(times)); } catch(e) {}
+  return { blocked: false };
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   CLIENT-SIDE RATE LIMITING — chatbot
+   Prevents flooding the bot with hundreds of messages in one session.
+───────────────────────────────────────────────────────────────────────── */
+let _chatCount = 0;
+const _CHAT_MAX = 60;
+
+function submitBooking() {
+  // ── HONEYPOT CHECK ──────────────────────────────────────────────────────
+  // Real users never see or fill this field. Any value = automated bot.
+  // Silent return — do not signal detection to the bot.
+  const honeypot = document.getElementById('fWebsite');
+  if (honeypot && honeypot.value) return;
+
+  // ── RATE LIMIT CHECK ────────────────────────────────────────────────────
+  const rl = checkFormRateLimit();
+  if (rl.blocked) {
+    alert('Too many submissions. Please wait ' + rl.waitMin + ' minute' + (rl.waitMin !== 1 ? 's' : '') + ' before trying again.');
+    return;
+  }
+
+  // ── RAW VALUES ──────────────────────────────────────────────────────────
+  const rawName  = document.getElementById('fName').value;
+  const rawBiz   = document.getElementById('fBiz').value;
+  const rawPhone = document.getElementById('fPhone').value;
+  const rawEmail = document.getElementById('fEmail').value;
+  const rawNotes = document.getElementById('fNotes').value;
+
+  // ── SCHEMA VALIDATION ───────────────────────────────────────────────────
+  // Presence checks, length limits, and format checks before any processing.
+  // Length limits: name 100, biz 150, phone 20, email 254, notes 600 chars.
+  if (!rawName.trim() || !rawBiz.trim() || !rawPhone.trim() || !rawEmail.trim()) {
+    alert('Please fill in all required fields (Name, Brokerage, Phone, and Email).');
+    return;
+  }
+  if (rawName.trim().length > 100) {
+    alert('Name must be 100 characters or fewer.');
+    return;
+  }
+  if (rawBiz.trim().length > 150) {
+    alert('Brokerage / Business name must be 150 characters or fewer.');
+    return;
+  }
+  if (!isValidEmail(rawEmail.trim())) {
+    alert('Please enter a valid email address.');
+    return;
+  }
+  if (!isValidPhone(rawPhone.trim())) {
+    alert('Please enter a valid phone number (7 to 15 digits).');
+    return;
+  }
+
+  // ── SANITIZATION ────────────────────────────────────────────────────────
+  // Strip HTML tags from all fields before they touch the email template.
+  // Prevents script/HTML injection in the confirmation email body.
+  const name  = sanitizeInput(rawName,  100);
+  const biz   = sanitizeInput(rawBiz,   150);
+  const phone = sanitizeInput(rawPhone,  20);
+  const email = sanitizeInput(rawEmail, 254);
+  const notes = sanitizeInput(rawNotes, 600);
+
+  const d         = calState.selectedDate;
+  const t         = calState.selectedTime;
+  const dateStr   = d ? (MONTHS[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()) : 'TBD';
+  const timeStr   = t || 'TBD';
+  const firstName = name.split(' ')[0];
+
+  const msg = document.getElementById('confirmMsg');
+  if (msg) {
+    msg.textContent = 'Your call is confirmed for '+dateStr+' at '+timeStr+'. We\'re looking forward to mapping out your automation strategy!';
+  }
+
+  // ── GOOGLE CALENDAR URL ─────────────────────────────────────────────────
+  const gcalBtn = document.getElementById('gcalBtn');
+  if (gcalBtn && d && t) {
+    const tMatch = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (tMatch) {
+      let h = parseInt(tMatch[1]), m = parseInt(tMatch[2]), ampm = tMatch[3].toUpperCase();
+      if (ampm === 'PM' && h !== 12) h += 12;
+      if (ampm === 'AM' && h === 12) h = 0;
+      const pad    = n => String(n).padStart(2,'0');
+      const yr     = d.getFullYear(), mo = pad(d.getMonth()+1), dy = pad(d.getDate());
+      const startStr = `${yr}${mo}${dy}T${pad(h)}${pad(m)}00`;
+      const endDate  = new Date(d.getFullYear(), d.getMonth(), d.getDate(), h, m+30);
+      const endStr   = `${endDate.getFullYear()}${pad(endDate.getMonth()+1)}${pad(endDate.getDate())}T${pad(endDate.getHours())}${pad(endDate.getMinutes())}00`;
+      const title    = encodeURIComponent('Strategy Call with Autify');
+      const details  = encodeURIComponent('30-minute strategy call with the Autify team. We\'ll map your real estate workflow and show you exactly how The Deal Machine would save you time and money. No commitment required.\n\nAutify — Done-For-You AI Automation for Real Estate Agents\nautify.com');
+      gcalBtn.href   = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&location=Zoom+(link+sent+via+email)`;
+    }
+  }
+
+  // ── SEND VIA EMAILJS ────────────────────────────────────────────────────
+  // SECURITY: serviceID and templateID are visible in client source.
+  // Enforce Allowed Origins in the EmailJS dashboard to prevent quota abuse
+  // from other domains: Dashboard → Account → Security → Allowed Origins.
+  const submitBtn = document.getElementById('submitBtn');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending...'; }
+
+  emailjs.send('service_qm0mjes', 'template_zwfbdwa', {
+    first_name:       firstName,
+    full_name:        name,
+    brokerage:        biz,
+    phone_number:     phone,
+    email:            email,
+    additional_notes: notes || 'None provided.',
+    appointment_date: dateStr,
+    appointment_time: timeStr,
+  }).then(function() {
+    showStep(4);
+  }, function(err) {
+    // Log status/text only — never log sanitized user data to the console
+    console.error('EmailJS send failed — status:', err.status, 'text:', err.text);
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Confirm My Spot'; }
+    alert('There was a problem sending your confirmation email. Your booking is still registered — if you don\'t receive an email, contact us at hello@autify.com.');
+    showStep(4);
+  });
+}
+
+initCal();
+
+/* ── CHAT ── */
+const BOOK_CTAS = [
+  'If you want to talk to an expert, <a href="#book" class="underline font-semibold" style="color:#E0550A">book your free strategy call here.</a>',
+  'Want someone to walk you through it? <a href="#book" class="underline font-semibold" style="color:#E0550A">Book your free strategy call here.</a>',
+  'If you want to go deeper on your specific setup, <a href="#book" class="underline font-semibold" style="color:#E0550A">book your free strategy call here.</a>',
+  'For a no-pressure walkthrough of your workflow, <a href="#book" class="underline font-semibold" style="color:#E0550A">book your free strategy call here.</a>',
+  'Ready to see how it fits your business? <a href="#book" class="underline font-semibold" style="color:#E0550A">Book your free strategy call here.</a>',
+  'To map out the specifics with a real person, <a href="#book" class="underline font-semibold" style="color:#E0550A">book your free strategy call here.</a>',
+  'The fastest way to get clarity is a quick call. <a href="#book" class="underline font-semibold" style="color:#E0550A">Book your free strategy call here.</a>',
+  'If it makes sense to talk it through, <a href="#book" class="underline font-semibold" style="color:#E0550A">book your free strategy call here.</a>',
+  'Want to run through your exact workflow with us? <a href="#book" class="underline font-semibold" style="color:#E0550A">Book your free strategy call here.</a>',
+  'If you want a real conversation about whether this fits, <a href="#book" class="underline font-semibold" style="color:#E0550A">book your free strategy call here.</a>',
+];
+let _bookIdx = 0;
+function BOOK() {
+  const cta = BOOK_CTAS[_bookIdx % BOOK_CTAS.length];
+  _bookIdx++;
+  return ' ' + cta;
+}
+
+let ctx = { deals: null, crm: null, tc: null, phase: 'start' };
+
+const CRM_LIST = ['follow up boss','kvcore','hubspot','chime','lofty','boomtown','sierra','liondesk','wise agent','top producer','realvolve','salesforce','zoho','pipedrive','firepoint'];
+
+function parseDeals(s) {
+  let m = s.match(/(\d+)\s*[-to]+\s*(\d+)/);
+  if (m) return Math.round((+m[1] + +m[2]) / 2);
+  m = s.match(/(\d+)\s*(?:deal|transaction|close|listing|month|mo\b)/);
+  if (m) return +m[1];
+  if (/\bone\b/.test(s)) return 1;
+  if (/\btwo\b/.test(s)) return 2;
+  if (/\bthree\b/.test(s)) return 3;
+  if (/\bfour\b/.test(s)) return 4;
+  if (/\bfive\b/.test(s)) return 5;
+  if (/\bsix\b/.test(s)) return 6;
+  if (/\bseven\b/.test(s)) return 7;
+  if (/\beight\b/.test(s)) return 8;
+  if (/\bten\b/.test(s)) return 10;
+  return null;
+}
+
+function parseCrm(s) { return CRM_LIST.find(c => s.includes(c)) || null; }
+
+function savings(deals) {
+  return `At ${deals} deals a month, you are probably spending between $${(deals*300).toLocaleString()} and $${(deals*500).toLocaleString()} in TC fees. The Deal Machine replaces most of that for $297 a month.`;
+}
+
+function getBotReply(raw) {
+  const s = raw.toLowerCase();
+
+  // Update context from message
+  const d = parseDeals(s); if (d) ctx.deals = d;
+  const c = parseCrm(s);   if (c) ctx.crm = c;
+  if (/myself|my own|doing it|no tc|i do (the|my)|self/.test(s)) ctx.tc = 'self';
+  if (/pay(ing)?.*tc|hired.*tc|have a tc|paying someone/.test(s)) ctx.tc = 'paid';
+
+  // --- PRICING ---
+  if (/\bhow much\b|\bcost\b|\bprice\b|\bpricing\b|\$297|\$497/.test(s)) {
+    return `The Deal Machine is $497 for setup (one-time, done-for-you) and $297 a month after that. No per-deal fees, no contract. ${ctx.deals ? savings(ctx.deals) + ' ' : ''}The setup fee usually pays itself back within the first deal or two.${BOOK()}`;
+  }
+
+  // --- CONTRACT / CANCEL ---
+  if (/\bcontract\b|\bcancel\b|\block.in\b|\bminimum\b|\bcommitment\b/.test(s)) {
+    return `No contract and no lock-in. The subscription is month-to-month. The $497 setup is non-refundable since we build the system for you, but you can cancel the monthly fee any time after that with no penalty.${BOOK()}`;
+  }
+
+  // --- SETUP TIMELINE ---
+  if (/how long|setup time|how fast|when.*live|72 hour|timeline|how quick/.test(s)) {
+    return `Setup takes 72 hours from your onboarding call. We handle everything: CRM integration, workflow configuration, and all three components. You do not touch any settings. By the time the call ends we have what we need to build it.${BOOK()}`;
+  }
+
+  // --- WHAT IT DOES ---
+  if (/what (is|does|are)|how does it work|explain|tell me more|what.*deal machine|what.*include|what.*get|features|components/.test(s)) {
+    return `The Deal Machine is three tools bundled together. The AI Transaction Coordinator tracks all your deal deadlines and sends automatic reminders to lenders, title companies, and inspectors so you are not the one chasing everyone. The Deal Status Hub gives buyers, sellers, and other parties a live view of where things stand, which cuts down the update calls you get. The Post-Call CRM Agent listens to your calls and fills your CRM automatically afterward, so you never have to manually log a contact or deal stage again. All three run in the background after a one-time 72-hour setup.${BOOK()}`;
+  }
+
+  // --- CRM COMPATIBILITY ---
+  if (/\bcrm\b|follow up boss|kvcore|hubspot|chime|lofty|boomtown|sierra|liondesk|wise agent|top producer|realvolve|salesforce|zoho|pipedrive|firepoint/.test(s)) {
+    const crm = ctx.crm;
+    if (crm === 'follow up boss') return `Follow Up Boss is one of our cleanest integrations. The post-call CRM agent connects via API and auto-fills contact records, deal stages, and follow-up tasks right after every call. No manual entry.${BOOK()}`;
+    if (crm === 'kvcore') return `KVCore works. We connect via Zapier and build the automations around your existing KVCore setup. Deadline tracking and the post-call agent both run reliably with it.${BOOK()}`;
+    if (crm === 'hubspot') return `HubSpot works well. We use the native API to connect the post-call agent and transaction coordinator. It is one of the more stable integrations because HubSpot has solid API access.${BOOK()}`;
+    if (crm === 'chime' || crm === 'lofty') return `${crm.charAt(0).toUpperCase()+crm.slice(1)} is supported via Zapier. We configure the triggers and automations around your existing setup during onboarding.${BOOK()}`;
+    return `We support most CRMs with API or Zapier access. Follow Up Boss, KVCore, HubSpot, Chime, and most others work. We confirm your specific CRM on the setup call before you commit to anything. In about 95% of cases it is fully supported.${BOOK()}`;
+  }
+
+  // --- COMPLIANCE / LEGAL ---
+  if (/complian|legal|mls|regulat|rule|license|board|state law/.test(s)) {
+    return `The Deal Machine handles coordination, communication, and data entry. It does not draft contracts, represent parties, or make binding decisions. You remain the licensed agent on every transaction. That said, we always recommend a quick check with your broker if you want to be thorough. We have had no compliance issues across our current client base.${BOOK()}`;
+  }
+
+  // --- MISTAKES / RELIABILITY ---
+  if (/mistake|error|wrong|reliab|trust|fail|inaccurate|miss.*deadline|deadline.*miss/.test(s)) {
+    return `The system flags anything uncertain for you to review rather than acting on it automatically. You get a daily summary of all active deal milestones, and anything time-sensitive has a human checkpoint before it goes out. It is not infallible, and we say that upfront. The goal is to remove repetitive work, not to replace your judgment on things that matter.${BOOK()}`;
+  }
+
+  // --- ROI / WORTH IT ---
+  if (/worth it|roi|return|saving|save money|pay for itself|payback|value/.test(s)) {
+    if (ctx.deals) return `${savings(ctx.deals)} The system typically pays for itself within the first couple of deals.${BOOK()}`;
+    return `A human TC usually charges $300 to $500 per deal. At 4 deals a month that is $1,200 to $2,000 gone. The Deal Machine is $297 a month flat, regardless of how many deals you run through it. The math works out quickly, even at lower volume.${BOOK()}`;
+  }
+
+  // --- TC REPLACEMENT ---
+  if (/replac.*tc|tc.*replac|fire.*tc|get rid.*tc|without.*tc|no.*tc/.test(s)) {
+    return `The Deal Machine takes over the work most TCs charge for: deadline tracking, party reminders, status updates, and CRM entry. You keep doing the licensed work. ${ctx.tc === 'paid' ? 'Since you are currently paying a TC per deal, the monthly savings here are pretty straightforward to calculate.' : ctx.tc === 'self' ? 'Since you are doing the TC work yourself, the bigger gain for you is probably time, not just money.' : ''} The exact fit depends on your workflow, which is worth a short call to go through.${BOOK()}`;
+  }
+
+  // --- TIME SAVINGS ---
+  if (/\btime\b|hours|busy|overwhelm|too much|free up|more time|week/.test(s)) {
+    if (ctx.deals) {
+      const lo = ctx.deals * 3, hi = ctx.deals * 5;
+      return `At ${ctx.deals} deals a month, most agents spend ${lo} to ${hi} hours on coordination tasks: chasing parties, sending updates, logging calls in their CRM. The Deal Machine handles most of that automatically. The exact time savings depend on your current process, which is worth going through on a call.${BOOK()}`;
+    }
+    return `Transaction coordination typically takes 3 to 5 hours per deal. The Deal Machine automates most of it: deadline reminders, status updates to all parties, and post-call CRM entry. The time savings compound quickly as deal volume increases.${BOOK()}`;
+  }
+
+  // --- SUPPORT ---
+  if (/support|help after|issue after|ongoing|maintain|breaks|something wrong/.test(s)) {
+    return `Ongoing support is included in the monthly fee. If something breaks or your CRM updates and causes a sync issue, we fix it. You are not on your own after setup.${BOOK()}`;
+  }
+
+  // --- GETTING STARTED ---
+  if (/get start|onboard|first step|sign up|how do i|begin|next step/.test(s)) {
+    return `The first step is a free 30-minute strategy call. We go through your workflow, confirm your CRM is supported, and if it is a fit we collect what we need to build the system. From there, it is 72 hours to live.${BOOK()}`;
+  }
+
+  // --- TRIAL / GUARANTEE ---
+  if (/trial|guarantee|risk|refund|money back|try it/.test(s)) {
+    return `There is no free trial, but there is a 30-day guarantee. If the system is not working as described in the first 30 days, we either fix it or refund the setup fee. The strategy call is also completely free, so there is no risk in starting there.${BOOK()}`;
+  }
+
+  // --- TEAM / SOLO ---
+  if (/team|partner|assistant|brokerage|group|with someone/.test(s)) {
+    return `The Deal Machine is built for solo agents, but it works fine if you have a partner or small team. The Deal Status Hub in particular is useful for teams since all parties see the same live view. If you have more than one agent running deals through it, let us know on the setup call so we configure it correctly.${BOOK()}`;
+  }
+
+  // --- HOW THE STATUS HUB WORKS ---
+  if (/status hub|status update|buyer.*update|seller.*update|client.*update|portal/.test(s)) {
+    return `The Deal Status Hub is a shared view that everyone on a deal (buyer, seller, lender, title) can access. It shows where things stand in real time: what is pending, what is done, and what is coming up. The main effect is that your clients stop calling you for updates because they can just check it themselves.${BOOK()}`;
+  }
+
+  // --- HOW THE CRM AGENT WORKS ---
+  if (/crm agent|auto.fill|post.call|call.*crm|logging|manual entry|update contact/.test(s)) {
+    return `The Post-Call CRM Agent joins or listens to your calls and automatically fills in your CRM after the call ends. It logs the contact details, updates the deal stage, and creates follow-up tasks based on what was discussed. You do not have to touch your CRM after a call.${BOOK()}`;
+  }
+
+  // --- HOW THE TC WORKS ---
+  if (/transaction coord|ai tc|deadline|reminder|lender|title|inspector|coordination/.test(s)) {
+    return `The AI Transaction Coordinator tracks every deadline on your active deals and sends reminders to the relevant parties when action is needed. If the lender needs to send docs by Friday, it follows up. If the inspector has not confirmed, it sends a reminder. You see a daily summary and can override anything, but most of it runs without you touching it.${BOOK()}`;
+  }
+
+  // --- WORKFLOW MAPPING FLOW ---
+  if (ctx.phase === 'start') {
+    ctx.phase = 'asked_deals';
+    if (d && c) {
+      // They gave everything in the first message
+      ctx.phase = 'mapped';
+      const tcLine = ctx.tc === 'paid'
+        ? `Since you are currently paying a TC, the most direct saving is ${savings(ctx.deals)}`
+        : ctx.tc === 'self'
+        ? `Since you are handling the TC work yourself, the bigger win here is probably getting back ${ctx.deals * 3} to ${ctx.deals * 5} hours a month.`
+        : savings(ctx.deals);
+      return `Here is what the setup would look like for you. You are closing ${ctx.deals} deals a month using ${ctx.crm}. We connect the Transaction Coordinator to your deal pipeline so deadlines are tracked and reminders go out automatically. The Deal Status Hub gets shared with your clients so they see live updates instead of calling you. The post-call CRM agent connects to ${ctx.crm} and fills in records after every call. ${tcLine} The best next step is a 30-minute call to confirm compatibility and go through your specific workflow.${BOOK()}`;
+    }
+    return d
+      ? `Got it, ${ctx.deals} deal${ctx.deals > 1 ? 's' : ''} a month. What CRM are you using right now?${BOOK()}`
+      : `How many deals do you close on average each month?${BOOK()}`;
+  }
+
+  if (ctx.phase === 'asked_deals') {
+    if (ctx.deals) {
+      ctx.phase = ctx.crm ? 'asked_pain' : 'asked_crm';
+      return ctx.crm
+        ? `Got it. Are you currently paying a TC per deal, handling coordination yourself, or somewhere in between?${BOOK()}`
+        : `Got it, ${ctx.deals} deal${ctx.deals > 1 ? 's' : ''} a month. What CRM are you using?${BOOK()}`;
+    }
+    return `What's your rough deal volume per month? Even an estimate is fine.${BOOK()}`;
+  }
+
+  if (ctx.phase === 'asked_crm') {
+    ctx.phase = 'asked_pain';
+    if (ctx.crm) return `Got it. Are you currently paying a TC per deal, handling coordination yourself, or neither?${BOOK()}`;
+    return `What CRM are you using right now? Follow Up Boss, KVCore, HubSpot, or something else?${BOOK()}`;
+  }
+
+  if (ctx.phase === 'asked_pain') {
+    ctx.phase = 'mapped';
+    const deals = ctx.deals || 4;
+    const crm = ctx.crm || 'your CRM';
+    const tcLine = ctx.tc === 'paid'
+      ? `Since you are paying a TC, the most direct saving is ${savings(deals)}`
+      : ctx.tc === 'self'
+      ? `Since you handle coordination yourself, you are looking at getting back ${deals * 3} to ${deals * 5} hours a month as much as the dollar savings.`
+      : savings(deals);
+    return `Here is what the setup would look like. You are closing ${deals} deal${deals > 1 ? 's' : ''} a month${crm !== 'your CRM' ? ` on ${crm}` : ''}. We connect the Transaction Coordinator to your pipeline so deadlines and reminders go out automatically. The Deal Status Hub gives your clients and all parties a live deal view so they stop calling you for updates. The post-call CRM agent connects to ${crm} and logs everything after every call. ${tcLine} To go through the specifics of your workflow and confirm your stack is compatible, a 30-minute call is the right next step.${BOOK()}`;
+  }
+
+  // --- FALLBACK ---
+  return `That is a fair question. For anything specific to your workflow the strategy call is the best place to go through it properly. It is free, 30 minutes, and no pressure.${BOOK()}`;
+}
+
+function addMessage(text, isUser) {
+  const box = document.getElementById('chatMessages');
+  if (!box) return;
+  const div = document.createElement('div');
+  div.className = isUser ? 'cb-u' : 'cb-a';
+  div.style.cssText = 'opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s';
+  if (isUser) {
+    div.textContent = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+    requestAnimationFrame(() => { div.style.opacity = '1'; div.style.transform = 'none'; });
+  } else {
+    // Strip HTML for typewriter, then swap to innerHTML at the end
+    const hasHTML = /<[a-z]/i.test(text);
+    const plain = hasHTML ? text.replace(/<[^>]+>/g, (m) => m.includes('href') ? '' : '') : text;
+    div.textContent = '';
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+    requestAnimationFrame(() => { div.style.opacity = '1'; div.style.transform = 'none'; });
+    let i = 0;
+    const iv = setInterval(() => {
+      if (i < plain.length) { div.textContent += plain[i++]; box.scrollTop = box.scrollHeight; }
+      else { clearInterval(iv); if (hasHTML) div.innerHTML = text; }
+    }, 16);
+  }
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  if (!input) return;
+
+  // ── CHAT RATE LIMIT ─────────────────────────────────────────────────────
+  // Caps the chatbot at 60 user messages per page session to prevent
+  // resource exhaustion and scraping of all bot responses in bulk.
+  if (_chatCount >= _CHAT_MAX) {
+    addMessage('You\'ve sent a lot of messages. For a real conversation about your workflow, book a free strategy call — that\'s the best place to go through everything properly.', false);
+    input.disabled = true;
+    return;
+  }
+
+  // ── INPUT LENGTH CAP ────────────────────────────────────────────────────
+  // Prevents oversized strings from being passed into getBotReply regex
+  // matching (ReDoS mitigation) and displayed in the chat DOM.
+  const raw = input.value.trim().slice(0, 500);
+  if (!raw) return;
+
+  _chatCount++;
+  addMessage(raw, true);
+  input.value = '';
+  const sugg = document.getElementById('chatSuggestions');
+  if (sugg) sugg.style.display = 'none';
+  setTimeout(() => addMessage(getBotReply(raw), false), 650);
+}
+
+function sendSuggestion(btn) {
+  if (_chatCount >= _CHAT_MAX) return;
+  // btn.textContent is already plain text — no sanitization needed
+  const text = btn.textContent.trim().slice(0, 500);
+  if (!text) return;
+  _chatCount++;
+  addMessage(text, true);
+  const sugg = document.getElementById('chatSuggestions');
+  if (sugg) sugg.style.display = 'none';
+  setTimeout(() => addMessage(getBotReply(text), false), 650);
+}
+</script>
+</body>
+</html>
