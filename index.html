@@ -228,11 +228,16 @@
       h2.font-black{font-size:1.875rem!important;line-height:1.1!important}
       h1.font-black{font-size:2rem!important;line-height:1.05!important}
 
-      /* Hamburger menu animation */
+      /* Hamburger button bars */
       #menuBtn span{display:block;width:20px;height:2px;background:#1C1108;border-radius:2px;transition:transform .25s,opacity .25s}
       #menuBtn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
       #menuBtn.open span:nth-child(2){opacity:0}
       #menuBtn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+      /* Mobile menu — hidden by default, shown via JS .is-open class only */
+      #mobileMenu{display:none}
+      #mobileMenu.is-open{display:block;animation:menuDrop .2s cubic-bezier(.22,1,.36,1)}
+      @keyframes menuDrop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 
       /* Chat widget: reduce fixed heights so it doesn't dominate a mobile screen */
       #chatMessages{max-height:210px!important}
@@ -287,8 +292,8 @@
     </div>
   </nav>
 
-  <!-- Mobile slide-down menu -->
-  <div id="mobileMenu" class="hidden md:hidden bg-cream border-t border-cream3 shadow-lg px-6 pt-5 pb-7">
+  <!-- Mobile slide-down menu — visibility controlled by #mobileMenu.is-open CSS, not Tailwind -->
+  <div id="mobileMenu" class="bg-cream border-t border-cream3 shadow-lg px-6 pt-5 pb-7">
     <nav class="flex flex-col gap-1">
       <a href="#how-it-works" onclick="toggleMenu()" class="text-base font-semibold text-ink py-3 border-b border-cream3 hover:text-orange transition-colors flex items-center justify-between">How It Works <svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
       <a href="#use-cases" onclick="toggleMenu()" class="text-base font-semibold text-ink py-3 border-b border-cream3 hover:text-orange transition-colors flex items-center justify-between">Use Cases <svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>
@@ -1409,13 +1414,7 @@ document.querySelectorAll('[data-target]').forEach(el=>co.observe(el));
   animate();
 })();
 
-/* ── Mobile Nav ── */
-const menuBtn=document.getElementById('menuBtn');
-const mobileMenu=document.getElementById('mobileMenu');
-if(menuBtn&&mobileMenu){
-  menuBtn.addEventListener('click',()=>{mobileMenu.classList.toggle('hidden');});
-  mobileMenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileMenu.classList.add('hidden')));
-}
+/* ── Mobile Nav — handled by toggleMenu() via inline onclick ── */
 
 /* ── Nav scroll shrink ── */
 window.addEventListener('scroll',()=>{
@@ -1427,10 +1426,10 @@ window.addEventListener('scroll',()=>{
 function toggleMenu(){
   const menu = document.getElementById('mobileMenu');
   const btn  = document.getElementById('menuBtn');
-  const open = menu.classList.toggle('hidden') === false;
+  // Use our own is-open class — avoids conflicts with Tailwind's hidden utility
+  const open = menu.classList.toggle('is-open');
   btn.classList.toggle('open', open);
   btn.setAttribute('aria-expanded', String(open));
-  // Prevent body scroll when menu is open
   document.body.style.overflow = open ? 'hidden' : '';
 }
 
