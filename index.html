@@ -271,6 +271,8 @@
       #mobileMenu{display:none}
       #mobileMenu.is-open{display:block;animation:menuDrop .2s cubic-bezier(.22,1,.36,1)}
       @keyframes menuDrop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+      /* Never show mobile menu on desktop — overrides .is-open regardless of JS state */
+      @media(min-width:768px){#mobileMenu,#mobileMenu.is-open{display:none!important}}
 
       /* Chat widget: reduce fixed heights so it doesn't dominate a mobile screen */
       #chatMessages{max-height:210px!important}
