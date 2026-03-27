@@ -261,21 +261,15 @@
       h2.font-black{font-size:1.875rem!important;line-height:1.1!important}
       h1.font-black{font-size:2rem!important;line-height:1.05!important}
 
-      /* Hamburger button bars */
+      /* Hamburger button bars (mobile only) */
       #menuBtn span{display:block;width:20px;height:2px;background:#1C1108;border-radius:2px;transition:transform .25s,opacity .25s}
       #menuBtn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
       #menuBtn.open span:nth-child(2){opacity:0}
       #menuBtn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 
-      /* Mobile menu — hidden by default, shown via JS .is-open class only */
-      #mobileMenu{display:none}
+      /* Mobile menu: show when .is-open is toggled by JS */
       #mobileMenu.is-open{display:block;animation:menuDrop .2s cubic-bezier(.22,1,.36,1)}
       @keyframes menuDrop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-      /* Never show hamburger or mobile menu on desktop — !important beats Tailwind Play CDN */
-      @media(min-width:768px){
-        #menuBtn{display:none!important}
-        #mobileMenu,#mobileMenu.is-open{display:none!important}
-      }
 
       /* Chat widget: reduce fixed heights so it doesn't dominate a mobile screen */
       #chatMessages{max-height:210px!important}
@@ -301,6 +295,15 @@
 
       /* Tighten hero bottom margin so it doesn't clip on short screens */
       .dot-grid{padding-top:5.5rem!important;padding-bottom:3rem!important;min-height:unset!important}
+    }
+
+    /* ── Mobile menu: hidden globally; only shown on mobile via .is-open ── */
+    #mobileMenu{display:none}
+
+    /* ── Desktop: force hamburger + mobile menu invisible — top-level so it always applies ── */
+    @media(min-width:768px){
+      #menuBtn{display:none!important}
+      #mobileMenu,#mobileMenu.is-open{display:none!important}
     }
   </style>
 </head>
