@@ -1472,6 +1472,19 @@ function toggleMenu(){
   btn.setAttribute('aria-expanded', String(open));
   document.body.style.overflow = open ? 'hidden' : '';
 }
+// Auto-close mobile menu when viewport grows to desktop size
+window.addEventListener('resize', () => {
+  if (window.innerWidth >= 768) {
+    const menu = document.getElementById('mobileMenu');
+    const btn  = document.getElementById('menuBtn');
+    if (menu && menu.classList.contains('is-open')) {
+      menu.classList.remove('is-open');
+      btn && btn.classList.remove('open');
+      btn && btn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+  }
+}, {passive: true});
 
 function toggleFaq(btn){
   const ans=btn.nextElementSibling;
