@@ -270,16 +270,9 @@
 
 <!-- NAV -->
 <header class="fixed top-0 left-0 right-0 z-50">
-  <!-- On mobile: 3-zone layout — hamburger placeholder left, logo center, hamburger right -->
-  <!-- On desktop: standard left-logo / center-links / right-CTA layout -->
   <nav class="nav-glass px-6 py-4 flex items-center justify-between max-w-7xl mx-auto relative">
 
-    <!-- Logo — centered on mobile via absolute positioning trick, left-aligned on desktop -->
-    <div class="flex-1 flex md:flex-none items-center">
-      <!-- Invisible spacer on mobile so logo centres between it and the hamburger -->
-      <div class="w-9 md:hidden"></div>
-    </div>
-    <a href="#" class="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 flex items-center gap-2.5" aria-label="Autify">
+    <a href="#" class="flex items-center gap-2.5" aria-label="Autify">
       <img src="logo.png" alt="Autify" class="w-9 h-9 rounded-xl object-cover"/>
       <span class="font-display font-semibold text-ink text-sm tracking-wide">Autify</span>
     </a>
@@ -292,8 +285,7 @@
       <a href="#book" class="hover:text-orange transition-colors cursor-pointer">Book a Call</a>
     </div>
 
-    <!-- Right side: Get Started (desktop only) + hamburger (mobile only) -->
-    <div class="flex-1 flex md:flex-none items-center justify-end gap-3">
+    <div class="flex items-center gap-3">
       <a href="#book" class="btn-s hidden md:flex cursor-pointer bg-orange hover:bg-orh text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all hover:shadow-lg hover:shadow-orange/25 focus:outline-none focus:ring-2 focus:ring-orange focus:ring-offset-2 items-center gap-1.5">
         Get Started <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
       </a>
